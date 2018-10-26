@@ -96,3 +96,15 @@ VARIABLE SCOPING
 -----------------------------------------------------------------------------------------
 
 Local variable shadowing is allowed.
+
+-----------------------------------------------------------------------------------------
+NULL
+-----------------------------------------------------------------------------------------
+
+Null is a special type that is used to indicate the absence of a value. 
+
+You cannot declare a variable of Null type as it is not treated as a normal built-in 
+type. 
+
+You may however assign a null literal to a String or any user-defined types. Null 
+is implemented to behave as a subtype of all these types.
