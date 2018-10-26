@@ -99,9 +99,16 @@ public class Ir3Builder {
         return currMdBuilder != null ? currMdBuilder.getReturnType() : null;
     }
 
+    public boolean isValidUserDefinedType(String type) {
+        return classToBuildersMap.containsKey(type);
+    }
+
+    /**
+     * Originally this checks that the declared variable is not of type Void 
+     * but apparently spec allows variable declarations of Void type.
+     */
     public boolean isValidDeclType(String type) {
-        return TypeHelper.isNonVoidBuiltInType(type) ||
-                classToBuildersMap.containsKey(type);
+        return isValidType(type);
     }
 
     public boolean isValidType(String type) {

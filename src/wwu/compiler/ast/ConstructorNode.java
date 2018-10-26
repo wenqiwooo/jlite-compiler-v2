@@ -19,7 +19,7 @@ public class ConstructorNode extends AtomNode {
     @Override
     public TypeCheckResult checkType(Ir3Builder env, boolean shouldReduce, String nextLabel) 
             throws TypeCheckException {
-        if (!env.isValidDeclType(type)) {
+        if (!env.isValidUserDefinedType(type)) {
             throw new ClassNotFoundException(type);
         }
 
