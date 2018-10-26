@@ -4,6 +4,8 @@ For testing conditional statements.
 
 class MainC {
     Void main (Int y, Int z){
+        /* Local variable shadowing is supported according to specs */
+        String x;
         Int x;
         x = new TestC().doWork(3, y == z, null);
     }

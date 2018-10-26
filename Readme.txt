@@ -89,3 +89,9 @@ doWork(null) matches both methods' signatures. In this scenario, the compiler wi
 the method that is declared first in the source file.
 
 See src/wwu/compiler/ir3/IR3ClassBuilder.java for more details on the implementation.
+
+-----------------------------------------------------------------------------------------
+VARIABLE SCOPING
+-----------------------------------------------------------------------------------------
+
+Local variable shadowing is allowed.
