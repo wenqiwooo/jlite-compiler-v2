@@ -1,0 +1,36 @@
+/*
+Test objects and method calls
+*/
+
+class MainC {
+    Void main (Int y, Int z){
+        Person luke;
+        Person alicia;
+
+        luke = null;
+        luke = new Person();
+        alicia = new Person();
+        
+        alicia.mom.getGrandpa().dad = luke.getGrandpa().dad.getGrandpa();
+        
+        println(alicia.getGrandpa().getAgeDifference(alicia));
+    }
+}
+
+class Person {
+    Person mom;
+    Person dad;
+    Int age;
+
+    Person getGrandpa() {
+        return this.dad.dad;
+    }
+
+    Int getAgeDifference(Person p) {
+        if (p.age > this.age) {
+            return p.age - this.age;
+        } else {
+            return this.age - p.age;
+        }
+    }
+}

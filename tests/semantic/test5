@@ -1,0 +1,19 @@
+/*
+Test method calls
+*/
+
+class MainC {
+    Void main() {
+        println(new TestC().fib(10));
+    }
+}
+
+class TestC {
+    Int fib(Int x) {
+        if (x == 0 || x == 1) {
+            return x;
+        } else {
+            return fib(x-2) + fib(x-1);
+        }
+    }
+}

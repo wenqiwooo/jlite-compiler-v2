@@ -1,0 +1,67 @@
+=============== CData3 ===============
+
+class MainC{
+}
+
+class TestC{
+    Int a;
+    Int b;
+    Bool z;
+}
+
+=============== CMtd3 ================
+
+Void main(MainC this){
+    Int r;
+    TestC _t1;
+    _t1 = new TestC();
+    r = %TestC_0(_t1,3,2);
+}
+
+Int %TestC_0(TestC this,Int x,Int y){
+    Int _t2;
+    Int _t3;
+    Int _t4;
+    Int _t5;
+    Bool _t6;
+    Bool _t7;
+    Bool _t8;
+    Bool _t9;
+    Bool _t10;
+    Bool _t11;
+    Int _t12;
+    Int _t13;
+    Int _t14;
+    Int _t15;
+    Int _t16;
+    Bool _t17;
+    Int _t18;
+  Label 2:
+    _t2 = this.a;
+    _t3 = this.b;
+    _t4 = _t2 + _t3;
+    _t5 = x * 100;
+    _t6 = _t4 < _t5;
+    _t7 = this.z;
+    _t8 = _t6 && _t7;
+    _t9 = this.z;
+    _t10 = !_t9;
+    _t11 = _t8 || _t10;
+    if (_t11) goto 3;
+    goto 1;
+  Label 3:
+    _t12 = -3;
+    _t13 = x + 8;
+    _t14 = 3 * y;
+    _t15 = -_t14;
+    _t16 = _t13 * _t15;
+    this.a = _t12 - _t16;
+    _t17 = this.z;
+    this.z = !_t17;
+    goto 2;
+  Label 1:
+    _t18 = this.a;
+    return _t18;
+}
+
+========= End of IR3 Program =========

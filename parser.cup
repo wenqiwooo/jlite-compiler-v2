@@ -1,0 +1,596 @@
+/*  
+JLite Parser Specification
+Author: Wu Wenqi    A0124278A
+*/
+package wwu.compiler;
+
+import java.io.*;
+import java.util.*;
+import java_cup.runtime.*;
+
+import wwu.compiler.ast.*;
+import wwu.compiler.common.*;
+import wwu.compiler.ir3.*;
+import wwu.compiler.exception.*;
+
+parser code {:
+    public static void main(String[] args) throws Exception {
+        try {
+            Lexer lexer = new Lexer(new FileReader(args[0]));
+            parser p = new parser(lexer);
+            ProgramNode pg = (ProgramNode)p.parse().value;
+            /**
+             * TODO: This parser is really inefficient at generating output.
+            **/
+            // System.out.print(pg);
+            
+            Ir3Builder irBuilder = new Ir3Builder();
+            irBuilder.initialize(pg.toClassBundles());
+            TypeCheckHelper.checkType(irBuilder, pg);
+            System.out.println(irBuilder.toCode());
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+:};
+
+/*
+Terminals
+*/
+
+terminal            LPAREN, RPAREN, LBRACE, RBRACE, SEMI, COMMA, PERIOD;
+// Main refers to the main method here. There is no naming restriction for main method's class.
+terminal            CLASS, THIS, NEW, NULL, MAIN;
+// Math operators
+terminal            PLUS, MINUS, TIMES, DIVIDE, ASSIGN;
+// Logical operators
+terminal            AND, OR, NOT, LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, EQUAL, NOT_EQUAL;
+// Control flow
+terminal            IF, ELSE, WHILE, READ, PRINT, RETURN;
+// Types
+terminal            INT, BOOL, STRING, VOID;
+terminal String     CNAME;
+// Literals
+terminal Integer    INT_LITERAL;
+terminal Boolean    BOOL_LITERAL;
+terminal String     STRING_LITERAL, ID;
+
+/*
+Non-terminals
+*/
+
+non terminal ProgramNode            program;
+non terminal String                 type;
+non terminal AtomNode               atom;
+non terminal ClassDeclNode          main_class, class_decl;
+non terminal List<ClassDeclNode>    class_decl_s;
+// Variables
+non terminal VarDeclNode            var_decl;
+non terminal List<VarDeclNode>      var_decl_s;
+// Methods
+non terminal List<VarDeclNode>      fml_list, fml_rest_s; 
+non terminal VarDeclNode            fml_rest;
+non terminal MdDeclNode             md_decl;
+non terminal List<MdDeclNode>       md_decl_s;
+non terminal MdBody                 md_body;
+// Statements
+non terminal StmtNode               stmt;
+non terminal List<StmtNode>         stmt_p, stmt_s;
+// Expressions
+non terminal ExprNode               exp, exp_rest;
+non terminal List<ExprNode>         exp_list, exp_rest_s;
+// Boolean expr.
+non terminal ExprNode               b_exp, conj, r_exp, b_grd;
+non terminal Op                 b_op;
+// Arithmetic expr.
+non terminal ExprNode               a_exp, term, ftr;
+non terminal Op                 a_exp_op, term_op;
+
+/* 
+Precedence declarations
+Adapted from Java's operator precedence
+*/
+
+// From least to most significant 
+precedence left OR;
+// Similar to Java, && has higher precedence than ||.
+precedence left AND;
+precedence nonassoc EQUAL, NOT_EQUAL;
+precedence left LESS, GREATER, LESS_EQUAL, GREATER_EQUAL;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence right NOT;
+precedence left LPAREN, RPAREN;
+
+start with program;
+
+/*
+Grammar
+*/
+
+program         ::= main_class:m class_decl_s:c
+                    {: 
+                        RESULT = new ProgramNode(m, c);
+                    :}
+                    ;
+
+main_class      ::= CLASS CNAME:c LBRACE VOID MAIN LPAREN fml_list:f RPAREN md_body:b RBRACE
+                    {: 
+                        List<MdDeclNode> mds = new ArrayList<>();
+                        mds.add(new MdDeclNode(Type.VOID, "main", f, b.varDecls, b.stmts));
+                        RESULT = new ClassDeclNode(c, new ArrayList<>(), mds);
+                    :}
+                    ;
+
+class_decl      ::= CLASS CNAME:c LBRACE var_decl_s:v md_decl_s:m RBRACE
+                    {: 
+                        RESULT = new ClassDeclNode(c, v, m);
+                    :}
+                    ;
+
+class_decl_s    ::= class_decl:c class_decl_s:r
+                    {: 
+                        RESULT = new ArrayList<ClassDeclNode>();
+                        RESULT.add(c);
+                        RESULT.addAll(r);
+                    :}
+                    |
+                    {: 
+                        RESULT = new ArrayList<ClassDeclNode>(); 
+                    :}
+                    ;
+
+var_decl        ::= type:t ID:i SEMI
+                    {: 
+                        RESULT = new VarDeclNode(i, t);
+                    :}
+                    ;
+
+var_decl_s      ::= var_decl_s:v var_decl:r
+                    {: 
+                        RESULT = new ArrayList<VarDeclNode>();
+                        RESULT.addAll(v);
+                        RESULT.add(r);
+                    :}
+                    |
+                    {: 
+                        RESULT = new ArrayList<VarDeclNode>();
+                    :}
+                    ;
+
+md_decl         ::= type:t ID:i LPAREN fml_list:f RPAREN md_body:m
+                    {: 
+                        RESULT = new MdDeclNode(t, i, f, m.varDecls, m.stmts);
+                    :}
+                    ;
+
+md_decl_s       ::= md_decl:m md_decl_s:r
+                    {: 
+                        RESULT = new ArrayList<MdDeclNode>();
+                        RESULT.add(m);
+                        RESULT.addAll(r);
+                    :}
+                    | 
+                    {: 
+                        RESULT = new ArrayList<MdDeclNode>();
+                    :}
+                    ;
+
+fml_list        ::= type:t ID:i fml_rest_s:f
+                    {: 
+                        RESULT = new ArrayList<VarDeclNode>();
+                        RESULT.add(new VarDeclNode(i, t));
+                        RESULT.addAll(f);
+                    :}
+                    | 
+                    {: 
+                        RESULT = new ArrayList<VarDeclNode>();
+                    :}
+                    ;
+
+fml_rest        ::= COMMA type:t ID:i
+                    {: 
+                        RESULT = new VarDeclNode(i, t);
+                    :}
+                    ;
+
+fml_rest_s      ::= fml_rest:f fml_rest_s:r
+                    {:
+                        RESULT = new ArrayList<VarDeclNode>();
+                        RESULT.add(f);
+                        RESULT.addAll(r);
+                    :}
+                    | 
+                    {: 
+                        RESULT = new ArrayList<VarDeclNode>();
+                    :}
+                    ;
+
+type            ::= INT 
+                    {: RESULT = Type.INT; :}
+                    | 
+                    BOOL 
+                    {: RESULT = Type.BOOL; :}
+                    | 
+                    STRING 
+                    {: RESULT = Type.STRING; :}
+                    | 
+                    VOID 
+                    {: RESULT = Type.VOID; :}
+                    | 
+                    CNAME:c
+                    {: RESULT = c; :}
+                    ;
+
+md_body         ::= LBRACE var_decl_s:v stmt_p:s RBRACE
+                    {: 
+                        RESULT = new MdBody(v, s);
+                    :}
+                    ;
+
+stmt            ::= IF LPAREN exp:a RPAREN LBRACE stmt_p:b RBRACE ELSE LBRACE stmt_p:c RBRACE
+                    {: 
+                        RESULT = new IfStmtNode(a, b, c);
+                    :}
+                    |
+                    WHILE LPAREN exp:a RPAREN LBRACE stmt_s:b RBRACE
+                    {: 
+                        RESULT = new WhileStmtNode(a, b);
+                    :}
+                    |
+                    READ LPAREN ID:i RPAREN SEMI
+                    {:
+                        RESULT = new ReadStmtNode(i);
+                    :}
+                    |
+                    PRINT LPAREN exp:e RPAREN SEMI
+                    {: 
+                        RESULT = new PrintStmtNode(e);
+                    :}
+                    |
+                    ID:i ASSIGN exp:e SEMI
+                    {: 
+                        RESULT = new AssignStmtNode(new IdNode(i), e);
+                    :}
+                    |
+                    atom:a PERIOD ID:i ASSIGN exp:e SEMI
+                    {: 
+                        RESULT = new AssignStmtNode(new FdNode(a, i), e);
+                    :}
+                    |
+                    atom:a LPAREN exp_list:e RPAREN SEMI
+                    {: 
+                        CallNode callNode = null;
+                        if (a instanceof IdNode) {
+                            IdNode idNode = (IdNode) a;
+                            callNode = new CallNode(null, idNode.name, e);
+                        } else if (a instanceof FdNode) {
+                            FdNode fdNode = (FdNode) a;
+                            callNode = new CallNode(fdNode.parent, fdNode.name, e);
+                        }
+                        RESULT = new CallStmtNode(callNode);
+                    :}
+                    |
+                    RETURN exp:e SEMI
+                    {: 
+                        RESULT = new ReturnStmtNode(e);
+                    :}
+                    |
+                    RETURN SEMI
+                    {: 
+                        RESULT = new ReturnStmtNode(null);
+                    :}
+                    ;
+
+stmt_p          ::= stmt:s stmt_s:r
+                    {: 
+                        RESULT = new ArrayList<StmtNode>();
+                        RESULT.add(s);
+                        RESULT.addAll(r);
+                    :}
+                    ;
+
+stmt_s          ::= stmt:s stmt_s:r
+                    {: 
+                        RESULT = new ArrayList<StmtNode>();
+                        RESULT.add(s);
+                        RESULT.addAll(r);
+                    :}
+                    |
+                    {: 
+                        RESULT = new ArrayList<StmtNode>();
+                    :}
+                    ;
+
+exp             ::= b_exp:e 
+                    {: 
+                        RESULT = e;
+                    :}
+                    | 
+                    a_exp:e 
+                    {: 
+                        RESULT = e;
+                    :}
+                    | 
+                    STRING_LITERAL:s
+                    {: 
+                        RESULT = new LiteralNode(Type.STRING, s);
+                    :}
+                    |
+                    atom:a
+                    {: 
+                        RESULT = a;
+                    :}
+                    ;
+
+b_exp           ::= b_exp:a OR conj:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.OR, a, b);
+                    :}
+                    |
+                    conj:e
+                    {: 
+                        RESULT = e;
+                    :}
+                    |
+                    b_exp:a OR atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.OR, a, b);
+                    :}
+                    |
+                    atom:a OR b_exp:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.OR, a, b);
+                    :}
+                    |
+                    atom:a OR atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.OR, a, b);
+                    :}
+                    ;
+
+conj            ::= conj:a AND r_exp:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.AND, a, b);
+                    :}
+                    |
+                    r_exp:e
+                    {: 
+                        RESULT = e;
+                    :}
+                    |
+                    conj:a AND atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.AND, a, b);
+                    :}
+                    |
+                    atom:a AND conj:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.AND, a, b);
+                    :}
+                    |
+                    atom:a AND atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(Op.AND, a, b);
+                    :}
+                    ;
+
+r_exp           ::= a_exp:a b_op:op a_exp:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    atom:a b_op:op a_exp:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    a_exp:a b_op:op atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    atom:a b_op:op atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    b_grd:e
+                    {: 
+                        RESULT = e;
+                    :}
+                    ;
+
+b_grd           ::= NOT b_grd:e
+                    {: 
+                        RESULT = new UnaryExprNode(Op.NOT, e);
+                    :}
+                    |
+                    BOOL_LITERAL:b
+                    {: 
+                        RESULT = new LiteralNode(Type.BOOL, b); 
+                    :}
+                    |
+                    NOT atom:a
+                    {: 
+                        RESULT = new UnaryExprNode(Op.NOT, a);
+                    :}
+                    ;
+
+b_op            ::= LESS
+                    {: RESULT = Op.LT; :}
+                    | 
+                    GREATER 
+                    {: RESULT = Op.GT; :}
+                    | 
+                    LESS_EQUAL 
+                    {: RESULT = Op.LEQ; :}
+                    | 
+                    GREATER_EQUAL 
+                    {: RESULT = Op.GEQ; :}
+                    | 
+                    EQUAL 
+                    {: RESULT = Op.EQ; :}
+                    | 
+                    NOT_EQUAL
+                    {: RESULT = Op.NEQ; :}
+                    ;
+
+a_exp           ::= term:t
+                    {: 
+                        RESULT = t;
+                    :}
+                    |
+                    a_exp:a a_exp_op:op term:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    a_exp:a a_exp_op:op atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    atom:a a_exp_op:op term:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    atom:a a_exp_op:op atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    ;
+
+a_exp_op        ::= PLUS
+                    {: RESULT = Op.ADD; :}
+                    | 
+                    MINUS
+                    {: RESULT = Op.SUB; :}
+                    ;
+
+term            ::= ftr:f
+                    {: 
+                        RESULT = f;
+                    :}
+                    |
+                    term:a term_op:op ftr:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    term:a term_op:op atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    atom:a term_op:op ftr:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    |
+                    atom:a term_op:op atom:b
+                    {: 
+                        RESULT = new BinaryExprNode(op, a, b);
+                    :}
+                    ;
+
+term_op         ::= TIMES
+                    {: RESULT = Op.MUL; :}
+                    | 
+                    DIVIDE
+                    {: RESULT = Op.DIV; :}
+                    ;
+
+ftr             ::= MINUS ftr:f
+                    {: 
+                        RESULT = new UnaryExprNode(Op.SUB, f);
+                    :}
+                    | 
+                    INT_LITERAL:i
+                    {: 
+                        RESULT = new LiteralNode(Type.INT, i);
+                    :}
+                    |
+                    MINUS atom:a
+                    {: 
+                        RESULT = new UnaryExprNode(Op.SUB, a); 
+                    :}
+                    ;
+
+atom            ::= atom:a PERIOD ID:i
+                    {: 
+                        RESULT = new FdNode(a, i);
+                    :}
+                    |
+                    atom:a LPAREN exp_list:e RPAREN
+                    {: 
+                        if (a instanceof IdNode) {
+                            IdNode idNode = (IdNode) a;
+                            RESULT = new CallNode(null, idNode.name, e);
+                        } else if (a instanceof FdNode) {
+                            FdNode fdNode = (FdNode) a;
+                            RESULT = new CallNode(fdNode.parent, fdNode.name, e);
+                        }
+                    :}
+                    |
+                    THIS
+                    {: 
+                        RESULT = new IdNode("this");
+                    :}
+                    |
+                    ID:i
+                    {: 
+                        RESULT = new IdNode(i);
+                    :}
+                    |
+                    NEW CNAME:c LPAREN RPAREN
+                    {: 
+                        RESULT = new ConstructorNode(c);
+                    :}
+                    |
+                    LPAREN exp:e RPAREN
+                    {: 
+                        if (e instanceof AtomNode) {
+                            RESULT = (AtomNode) e;
+                        } else {
+                            RESULT = new AtomExprNode(e);
+                        }
+                    :}
+                    |
+                    NULL
+                    {: 
+                        RESULT = new NullNode();
+                    :}
+                    ;
+
+exp_list        ::= exp:e exp_rest_s:r
+                    {: 
+                        RESULT = new ArrayList<ExprNode>();
+                        RESULT.add(e);
+                        RESULT.addAll(r);
+                    :}
+                    |
+                    {:
+                        RESULT = new ArrayList<ExprNode>();
+                    :}
+                    ;
+
+exp_rest        ::= COMMA exp:e
+                    {: 
+                        RESULT = e;
+                    :}
+                    ;
+
+exp_rest_s      ::= exp_rest:e exp_rest_s:r
+                    {: 
+                        RESULT = new ArrayList<ExprNode>();
+                        RESULT.add(e);
+                        RESULT.addAll(r);
+                    :}
+                    |
+                    {: 
+                        RESULT = new ArrayList<ExprNode>();
+                    :}
+                    ;

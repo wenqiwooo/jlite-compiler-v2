@@ -1,0 +1,69 @@
+=============== CData3 ===============
+
+class MainC{
+}
+
+class Person{
+    Person mom;
+    Person dad;
+    Int age;
+}
+
+=============== CMtd3 ================
+
+Void main(MainC this,Int y,Int z){
+    Person luke;
+    Person alicia;
+    Person _t1;
+    Person _t2;
+    Person _t3;
+    Person _t4;
+    Person _t5;
+    Int _t6;
+    luke = null;
+    luke = new Person();
+    alicia = new Person();
+    _t1 = alicia.mom;
+    _t2 = %Person_0(_t1);
+    _t3 = %Person_0(luke);
+    _t4 = _t3.dad;
+    _t2.dad = %Person_0(_t4);
+    _t5 = %Person_0(alicia);
+    _t6 = %Person_1(_t5,alicia);
+    println(_t6);
+}
+
+Person %Person_0(Person this){
+    Person _t7;
+    Person _t8;
+    _t7 = this.dad;
+    _t8 = _t7.dad;
+    return _t8;
+}
+
+Int %Person_1(Person this,Person p){
+    Int _t9;
+    Int _t10;
+    Int _t11;
+    Int _t12;
+    Int _t13;
+    Int _t14;
+    Int _t15;
+    Int _t16;
+    _t9 = p.age;
+    _t10 = this.age;
+    if (_t9 > _t10) goto 2;
+    _t11 = this.age;
+    _t12 = p.age;
+    _t13 = _t11 - _t12;
+    return _t13;
+    goto 1;
+  Label 2:
+    _t14 = p.age;
+    _t15 = this.age;
+    _t16 = _t14 - _t15;
+    return _t16;
+  Label 1:
+}
+
+========= End of IR3 Program =========

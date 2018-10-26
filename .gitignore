@@ -1,0 +1,12 @@
+*.class
+*.java~
+parser.java
+Lexer.java
+sym.java
+output.txt
+
+classes/
+
+sources
+
+.DS_Store

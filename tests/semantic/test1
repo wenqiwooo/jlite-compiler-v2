@@ -1,0 +1,28 @@
+/*
+For testing conditional statements.
+*/
+
+class MainC {
+    Void main (Int y, Int z){
+        Int x;
+        x = new TestC().doWork(3, y == z, null);
+    }
+}
+
+class TestC {
+    Int doWork(Int a, Bool b, String c) {
+        a = a + 100 / 20 + a;
+        if (a > 100) {
+            if (b) {
+                return a;
+            } else {
+                return -1;
+            }
+        } else {
+            while (b && a > 10) {
+                a = a - 1;
+            }
+            return a;
+        }
+    }
+}

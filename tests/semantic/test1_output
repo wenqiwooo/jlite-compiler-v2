@@ -1,0 +1,51 @@
+=============== CData3 ===============
+
+class MainC{
+}
+
+class TestC{
+}
+
+=============== CMtd3 ================
+
+Void main(MainC this,Int y,Int z){
+    Int x;
+    Bool _t1;
+    TestC _t2;
+    _t1 = y == z;
+    _t2 = new TestC();
+    x = %TestC_0(_t2,3,_t1,null);
+}
+
+Int %TestC_0(TestC this,Int a,Bool b,String c){
+    Int _t3;
+    Int _t4;
+    Bool _t5;
+    Bool _t6;
+    Int _t7;
+    _t3 = 100 / 20;
+    _t4 = a + _t3;
+    a = _t4 + a;
+    if (a > 100) goto 2;
+  Label 4:
+    _t5 = a > 10;
+    _t6 = b && _t5;
+    if (_t6) goto 5;
+    goto 3;
+  Label 5:
+    a = a - 1;
+    goto 4;
+  Label 3:
+    return a;
+    goto 1;
+  Label 2:
+    if (b) goto 6;
+    _t7 = -1;
+    return _t7;
+    goto 1;
+  Label 6:
+    return a;
+  Label 1:
+}
+
+========= End of IR3 Program =========

@@ -1,0 +1,10 @@
+/*
+Test for string expressions
+*/
+
+class Test3 {
+    Void main() {
+        String x;
+        x = "The quick brown fox jumps over the lazy dog";
+    }
+}

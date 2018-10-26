@@ -1,0 +1,29 @@
+/*
+Test for boolean operations
+*/
+
+class Test2 {
+    Void main(Int w, Bool x, Bool y, Bool z) {
+        Bool c;
+
+        c = true;
+        c = true || !false;
+
+        // && should have higher precedence than || here
+        c = x && y || z && x;
+        c = x || y && z || x;
+        c = (x || y) && (z || x);
+        c = (x && y) || (x || z);
+        
+        // Test equalities
+        c = x == y && w != z;
+        c = x == (!y);
+
+        c = x && (y || z) || y;
+        c = !!!!!!!x;
+        c = !!true && !false || (x && false) && z;
+
+        c = w > 5;
+        c = (x && w > 5) && 4 < w;
+    }
+}

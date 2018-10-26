@@ -1,0 +1,33 @@
+/*
+Test method overloading
+*/
+
+class MainC {
+    Void main() {
+        TestC x;
+
+        new TestC().doWork(1);
+        
+        // For ambiguous cases, assign to the valid method that is declared first.
+        new TestC().doWork(null);
+
+        x.doWork("Never ending work");
+        new TestC().doWork(x);
+    }
+}
+
+class TestC {
+    String c;
+
+    Void doWork(Int x) {
+        this.c = "Int work done!";
+    }
+
+    Void doWork(String x) {
+        this.c = "String work done!";
+    }
+
+    Void doWork(TestC x) {
+        this.c = "TestC work done!";
+    }
+}

@@ -1,0 +1,24 @@
+/*
+Arithemtic and boolean expressions
+*/
+
+class MainC {
+    Void main() {
+        Int r;
+        r = new TestC().calculate(3, 2);
+    }
+}
+
+class TestC {
+    Int a;
+    Int b;
+    Bool z;
+
+    Int calculate(Int x, Int y) {
+        while (this.a + this.b < x * 100 && this.z || !this.z) {
+            this.a = -((3)) - (x + (8)) * -(3 * y);
+            this.z = !this.z;
+        }
+        return this.a;
+    }
+}

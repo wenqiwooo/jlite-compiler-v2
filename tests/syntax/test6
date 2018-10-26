@@ -1,0 +1,69 @@
+/*
+Test for lexer
+*/
+
+    class Test6 /* Blah blah */{
+            Void main(A a, 
+        B b, 
+        Boolean t, 
+        Int x, Int y, 
+        Int z) 
+    {
+                    C c; /* Blah blah */
+        F f; // /* Blah blah */
+
+        // Blah blah 
+        // Blah blah 
+        // Blah blah 
+                t = x == y; // Blah blah 
+
+t = x != y;
+    
+    t = 
+        t != (!t);
+
+        // Blah blah 
+    if (x == y) {
+            /*
+            Blah blah blah Blah blah blah 
+            Blah blah blah Blah blah blah 
+            Blah blah blah Blah blah blah 
+            Blah blah blah Blah blah blah 
+            */
+    println("1");
+} else 
+{
+            /*
+            Blah blah blah Blah blah blah 
+            Blah blah blah Blah blah blah 
+            Blah blah blah Blah blah blah 
+            Blah blah blah Blah blah blah 
+            */
+    println("2");
+    while (t) 
+    {
+                readln(
+                    f
+                    );
+        f.i();
+                if (!f.g.z()) {
+            return t;
+    } else {
+        t = 
+            false;
+        }
+            }
+    if ((x > y || a.g() == t) 
+        && 
+        !t
+        ) 
+    {
+        return true;
+    } 
+    else 
+{
+                return false;
+        }
+}
+}
+    }

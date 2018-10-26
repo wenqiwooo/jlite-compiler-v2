@@ -1,0 +1,38 @@
+=============== CData3 ===============
+
+class MainC{
+}
+
+class TestC{
+    String c;
+}
+
+=============== CMtd3 ================
+
+Void main(MainC this){
+    TestC x;
+    TestC _t1;
+    TestC _t2;
+    TestC _t3;
+    _t1 = new TestC();
+    %TestC_0(_t1,1);
+    _t2 = new TestC();
+    %TestC_1(_t2,null);
+    %TestC_1(x,"Never ending work");
+    _t3 = new TestC();
+    %TestC_2(_t3,x);
+}
+
+Void %TestC_0(TestC this,Int x){
+    this.c = "Int work done!";
+}
+
+Void %TestC_1(TestC this,String x){
+    this.c = "String work done!";
+}
+
+Void %TestC_2(TestC this,TestC x){
+    this.c = "TestC work done!";
+}
+
+========= End of IR3 Program =========
