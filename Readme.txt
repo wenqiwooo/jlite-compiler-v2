@@ -18,7 +18,8 @@ In the terminal, navigate to project directory and run "make".
 This submission consists of the following files and directories:
 
 tests/
-This directory contains the test and test output files.
+This directory contains the test and test output files. The test cases for Assignment 2 are 
+found in tests/semantic/ directory.
 
 src/
 This directory contains the source files.
