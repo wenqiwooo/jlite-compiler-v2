@@ -13,14 +13,12 @@ class Jlc {
         try {
             Lexer lexer = new Lexer(new FileReader(args[0]));
             parser p = new parser(lexer);
-            ProgramNode pg = (ProgramNode)p.parse().value;
-
-            // System.out.print(pg);
+            ProgramNode ast = (ProgramNode)p.parse().value;
+            // System.out.print(ast);
             
-            Ir3Builder irBuilder = new Ir3Builder();
-            irBuilder.initialize(pg.toClassBundles());
-            TypeCheckHelper.checkType(irBuilder, pg);
-            System.out.println(irBuilder.toCode());
+            Ir3Builder ir3 = new Ir3Builder(ast.toClassBundles());
+            TypeCheckHelper.checkType(ir3, ast);
+            System.out.println(ir3.toCode());
         } 
         catch (Exception e) {
             e.printStackTrace();

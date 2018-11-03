@@ -12,12 +12,14 @@ import wwu.compiler.ir3.Ir3MdBuilder;
 import wwu.compiler.util.Pair;
 
 public class Ir3ClassBuilder {
-    public String className;
     public Map<String, String> classFieldsToTypeMap;
     // Mapping of method name to map of overloaded methods
     public Map<String, Map<String, Ir3MdBuilder>> methodToBuildersMap;
 
     private Map<String, String> methodToReturnTypeMap;
+    private String className;
+    // Size of class object in bytes
+    private int sizeBytes = 0;
     private int nextMethodEncodeId = 0;
 
     public Ir3ClassBuilder(ClassBundle classBundle) throws TypeCheckException {
@@ -33,6 +35,14 @@ public class Ir3ClassBuilder {
         for (MethodBundle method : classBundle.classMethods) {
             addMethod(method);
         }
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public int getSizeBytes() {
+        return sizeBytes;
     }
 
     public String getTypeForField(String fieldName) throws TypeCheckException {
@@ -125,6 +135,7 @@ public class Ir3ClassBuilder {
             throw new ClassFieldRedeclaredException(className, field.first());
         }
         classFieldsToTypeMap.put(field.first(), field.second());
+        sizeBytes += TypeHelper.getVarSizeForType(field.second());
     }
 
     /**

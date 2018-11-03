@@ -16,12 +16,8 @@ public class Ir3Builder {
     private int labelIdx;
     private int tempVarIdx;
 
-    public Ir3Builder() {
+    public Ir3Builder(List<ClassBundle> classBundles) throws TypeCheckException {
         classToBuildersMap = new LinkedHashMap<>();
-    }
-
-    public void initialize(List<ClassBundle> classBundles) 
-            throws TypeCheckException {
         for (ClassBundle classBundle : classBundles) {
             addClass(classBundle);
         }
@@ -84,11 +80,11 @@ public class Ir3Builder {
     }
 
     public String getCurrentClassType() {
-        return currClsBuilder != null ? currClsBuilder.className : null;
+        return currClsBuilder != null ? currClsBuilder.getClassName() : null;
     }
 
     public String getCurrentClassName() {
-        return currClsBuilder != null ? currClsBuilder.className : null;
+        return currClsBuilder != null ? currClsBuilder.getClassName() : null;
     }
 
     public String getCurrentMethodName() {
@@ -150,7 +146,7 @@ public class Ir3Builder {
 
     public void cgLocalDecl(String varName, String varType) {
         if (!isValidDeclType(varType)) {
-            throw new VariableInvalidTypeException(currClsBuilder.className, 
+            throw new VariableInvalidTypeException(currClsBuilder.getClassName(), 
                     currMdBuilder.getMethodName(), varName, varType);
         }
         currMdBuilder.addLocalDecl(varName, varType);
@@ -167,7 +163,7 @@ public class Ir3Builder {
         
         for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
             sb.append("class ")
-                .append(cb.className)
+                .append(cb.getClassName())
                 .append("{\n");
             for (Map.Entry<String, String> entry : cb.classFieldsToTypeMap.entrySet()) {
                 sb.append("    ")
@@ -201,14 +197,14 @@ public class Ir3Builder {
         }
         
         Ir3ClassBuilder cb = new Ir3ClassBuilder(classBundle);
-        classToBuildersMap.put(cb.className, cb);
+        classToBuildersMap.put(cb.getClassName(), cb);
     }
 
     private void validate() throws TypeCheckException {
         for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
             for (Map.Entry<String, String> entry : cb.classFieldsToTypeMap.entrySet()) {
                 if (!isValidDeclType(entry.getValue())) {
-                    throw new ClassFieldInvalidTypeException(cb.className, 
+                    throw new ClassFieldInvalidTypeException(cb.getClassName(), 
                             entry.getKey(), entry.getValue());
                 }
             }
