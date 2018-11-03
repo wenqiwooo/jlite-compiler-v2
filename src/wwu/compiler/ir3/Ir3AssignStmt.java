@@ -1,5 +1,7 @@
 package wwu.compiler.ir3;
 
+import wwu.compiler.arm.*;
+
 public class Ir3AssignStmt extends Ir3Stmt {
     Ir3Id assignee;
     Ir3Expr expr;
@@ -16,5 +18,10 @@ public class Ir3AssignStmt extends Ir3Stmt {
     @Override
     public String toString() {
         return assignee.toString() + " = " + expr.toString() + ";";
+    }
+
+    @Override
+    public void addToArmMd(ArmMd armMd) {
+
     }
 }

@@ -1,5 +1,7 @@
 package wwu.compiler.ir3;
 
+import wwu.compiler.arm.*;
+
 public class Ir3ReturnStmt extends Ir3Stmt {
     Ir3Id arg;
 
@@ -13,5 +15,10 @@ public class Ir3ReturnStmt extends Ir3Stmt {
             return "return;";
         }
         return "return " + arg.toString() + ";"; 
+    }
+
+    @Override
+    public void addToArmMd(ArmMd armMd) {
+
     }
 }

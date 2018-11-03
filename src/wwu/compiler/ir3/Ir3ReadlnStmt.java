@@ -1,5 +1,7 @@
 package wwu.compiler.ir3;
 
+import wwu.compiler.arm.*;
+
 public class Ir3ReadlnStmt extends Ir3Stmt {
     Ir3Id arg;
     
@@ -10,5 +12,10 @@ public class Ir3ReadlnStmt extends Ir3Stmt {
     @Override
     public String toString() {
         return "readln(" + arg.toString() + ");";
+    }
+
+    @Override
+    public void addToArmMd(ArmMd armMd) {
+
     }
 }

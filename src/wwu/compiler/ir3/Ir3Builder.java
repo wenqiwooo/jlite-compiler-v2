@@ -3,6 +3,7 @@ package wwu.compiler.ir3;
 import java.util.*;
 
 import wwu.compiler.util.Pair;
+import wwu.compiler.arm.ArmProgram;
 import wwu.compiler.common.TypeHelper;
 import wwu.compiler.exception.*;
 import wwu.compiler.exception.ClassNotFoundException;
@@ -165,7 +166,7 @@ public class Ir3Builder {
             sb.append("class ")
                 .append(cb.getClassName())
                 .append("{\n");
-            for (Map.Entry<String, String> entry : cb.classFieldsToTypeMap.entrySet()) {
+            for (Map.Entry<String, String> entry : cb.classFieldToTypeMap.entrySet()) {
                 sb.append("    ")
                     .append(entry.getValue())
                     .append(" ")
@@ -190,6 +191,20 @@ public class Ir3Builder {
         return sb.toString();
     }
 
+    public ArmProgram toArm() {
+        ArmProgram arm = new ArmProgram();
+
+        for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
+            for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
+                for (Ir3MdBuilder mb : mbs.values()) {
+
+                }
+            }
+        }
+
+        return arm;
+    }
+
     private void addClass(ClassBundle classBundle) throws TypeCheckException {
         // No two classes can be declared in a program with the same name.
         if (classToBuildersMap.containsKey(classBundle.className)) {
@@ -202,7 +217,7 @@ public class Ir3Builder {
 
     private void validate() throws TypeCheckException {
         for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
-            for (Map.Entry<String, String> entry : cb.classFieldsToTypeMap.entrySet()) {
+            for (Map.Entry<String, String> entry : cb.classFieldToTypeMap.entrySet()) {
                 if (!isValidDeclType(entry.getValue())) {
                     throw new ClassFieldInvalidTypeException(cb.getClassName(), 
                             entry.getKey(), entry.getValue());

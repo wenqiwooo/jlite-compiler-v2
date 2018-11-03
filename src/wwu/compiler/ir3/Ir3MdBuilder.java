@@ -2,6 +2,7 @@ package wwu.compiler.ir3;
 
 import java.util.*;
 
+import wwu.compiler.arm.*;
 import wwu.compiler.common.*;
 import wwu.compiler.exception.MethodParamRedeclaredException;
 import wwu.compiler.util.Pair;
@@ -12,8 +13,10 @@ public class Ir3MdBuilder {
     String methodEncodedName;
     String methodKey;
     String returnType;
+    // Parameter to type map
     Map<String, String> params;
     List<String> paramTypes;
+    // Local decl to type map
     Map<String, String> localDecls;
     List<Ir3Stmt> ir3Stmts;
 
@@ -143,5 +146,32 @@ public class Ir3MdBuilder {
 
     public String getParamType(String varName) {
         return params.getOrDefault(varName, null);
+    }
+
+    public ArmMd toArmMd(Ir3Builder builder) {
+        ArmMd armMd = new ArmMd();
+
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            armMd.addParam(armObjForVarDeclEntry(
+                    entry, armMd.getNewPseudoRegId()));
+        }
+
+        for (Map.Entry<String, String> entry : localDecls.entrySet()) {
+            armMd.addLocal(armObjForVarDeclEntry(
+                    entry, armMd.getNewPseudoRegId()));
+        }
+
+        for (Ir3Stmt ir3Stmt : ir3Stmts) {
+            ir3Stmt.addToArmMd(armMd);
+        }
+
+        return armMd;
+    }
+
+    // Entry: <name, type>
+    private ArmObj armObjForVarDeclEntry(Map.Entry<String, String> entry, 
+                int pseudoRegId) {
+        ArmMode mode = TypeHelper.getArmModeForType(entry.getValue());
+        return new ArmObj(entry.getKey(), pseudoRegId, mode);
     }
 }

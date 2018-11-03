@@ -23,25 +23,24 @@ public class TypeHelper {
     }
 
     /**
-     * Gets the size in bytes required for variable of type type.
+     * Gets the machine mode required for variable of type type.
      */
-    public static int getVarSizeForType(String type) {
+    public static ArmMode getArmModeForType(String type) {
         switch(type) {
             case Type.INT:
-                return Type.INT_SIZE;
+                return ArmMode.WORD;
             case Type.BOOL:
-                return Type.BOOL_SIZE;
+                return ArmMode.BYTE;
             case Type.STRING:
-                return Type.STRING_SIZE;
+                return ArmMode.WORD;
+            // Should not be allocating for Void and Null.
             case Type.VOID:
-                return Type.VOID_SIZE;
             case Type.NULL:
-                // Should throw here.
-                return 0;
+                return ArmMode.WORD;
             default:
                 // User-defined class are all dynamically allocated,
                 // so return size of mem addr
-                return Type.WORD_SIZE;
+                return ArmMode.WORD;
         }
     }
 }

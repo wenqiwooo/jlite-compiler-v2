@@ -12,21 +12,25 @@ import wwu.compiler.ir3.Ir3MdBuilder;
 import wwu.compiler.util.Pair;
 
 public class Ir3ClassBuilder {
-    public Map<String, String> classFieldsToTypeMap;
+    public Map<String, String> classFieldToTypeMap;
     // Mapping of method name to map of overloaded methods
     public Map<String, Map<String, Ir3MdBuilder>> methodToBuildersMap;
 
     private Map<String, String> methodToReturnTypeMap;
     private String className;
+    // Byte offset of class fields
+    private Map<String, Integer> classFieldToOffsetMap;
     // Size of class object in bytes
     private int sizeBytes = 0;
     private int nextMethodEncodeId = 0;
 
     public Ir3ClassBuilder(ClassBundle classBundle) throws TypeCheckException {
-        classFieldsToTypeMap = new LinkedHashMap<>();
+        classFieldToTypeMap = new LinkedHashMap<>();
         methodToBuildersMap = new LinkedHashMap<>();
         methodToReturnTypeMap = new HashMap<>();
         className = classBundle.className;
+
+        classFieldToOffsetMap = new LinkedHashMap<>();
 
         for (Pair<String, String> field : classBundle.classFields) {
             addField(field);
@@ -46,7 +50,7 @@ public class Ir3ClassBuilder {
     }
 
     public String getTypeForField(String fieldName) throws TypeCheckException {
-        String fieldType = classFieldsToTypeMap.getOrDefault(fieldName, null);
+        String fieldType = classFieldToTypeMap.getOrDefault(fieldName, null);
         if (fieldType == null) {
             throw new ClassFieldNotFoundException(className, fieldName);
         }
@@ -131,11 +135,12 @@ public class Ir3ClassBuilder {
 
     private void addField(Pair<String, String> field) throws TypeCheckException {
         // No two fields in a class can have the same name.
-        if (classFieldsToTypeMap.containsKey(field.first())) {
+        if (classFieldToTypeMap.containsKey(field.first())) {
             throw new ClassFieldRedeclaredException(className, field.first());
         }
-        classFieldsToTypeMap.put(field.first(), field.second());
-        sizeBytes += TypeHelper.getVarSizeForType(field.second());
+        classFieldToTypeMap.put(field.first(), field.second());
+        classFieldToOffsetMap.put(field.first(), sizeBytes);
+        sizeBytes += TypeHelper.getArmModeForType(field.second()).getSize();
     }
 
     /**
