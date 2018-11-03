@@ -11,7 +11,7 @@ class_path=$1
 
 # while [ $idx -le $syntax_tests_count ]
 # do
-#     java -cp $class_path wwu.compiler.parser tests/syntax/test$idx > output.txt
+#     java -cp $class_path wwu.compiler.Jlc tests/syntax/test$idx > output.txt
 #     res=$(diff --ignore-blank-lines --ignore-space-change output.txt tests/syntax/test"$idx"_output)
 #     if [ "$res" == "" ]
 #     then
@@ -27,7 +27,7 @@ class_path=$1
 
 while [ $idx -le $semantic_tests_count ]
 do
-    java -cp $class_path wwu.compiler.parser tests/semantic/test$idx > output.txt
+    java -cp $class_path wwu.compiler.Jlc tests/semantic/test$idx > output.txt
     res=$(diff --ignore-blank-lines --ignore-space-change output.txt tests/semantic/test"$idx"_output)
     if [ "$res" == "" ]
     then
