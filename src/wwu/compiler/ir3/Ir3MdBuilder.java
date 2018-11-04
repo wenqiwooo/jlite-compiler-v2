@@ -2,7 +2,7 @@ package wwu.compiler.ir3;
 
 import java.util.*;
 
-import wwu.compiler.arm.*;
+import wwu.compiler.cfg.*;
 import wwu.compiler.common.*;
 import wwu.compiler.exception.MethodParamRedeclaredException;
 import wwu.compiler.util.Pair;
@@ -18,7 +18,12 @@ public class Ir3MdBuilder {
     List<String> paramTypes;
     // Local decl to type map
     Map<String, String> localDecls;
-    List<Ir3Stmt> ir3Stmts;
+    
+    Ir3Stmt firstStmt;
+    Ir3Stmt lastStmt;
+
+    // Control flow graph
+    CFGraph cfGraph;
 
     public Ir3MdBuilder(String className, 
             String methodName,
@@ -49,8 +54,6 @@ public class Ir3MdBuilder {
         for (Pair<String, String> local : localList) {
             localDecls.put(local.first(), local.second());
         }
-
-        ir3Stmts = new ArrayList<>();
     }
 
     public void addLocalDecl(String varName, String varType) {
@@ -58,7 +61,13 @@ public class Ir3MdBuilder {
     }
 
     public void addCode(Ir3Stmt ir3Stmt) {
-        ir3Stmts.add(ir3Stmt);
+        if (firstStmt == null) {
+            firstStmt = ir3Stmt;
+        } else {
+            lastStmt.setNext(ir3Stmt);
+            ir3Stmt.setPrev(lastStmt);
+        }
+        lastStmt = ir3Stmt;
     }
 
     public String toCode() {
@@ -86,13 +95,15 @@ public class Ir3MdBuilder {
                 .append(";\n");
         }
 
-        for (Ir3Stmt ir3Stmt : ir3Stmts) {
+        Ir3Stmt ir3Stmt = firstStmt;
+        while (ir3Stmt != null) {
             sb.append("  ");
             if (!(ir3Stmt instanceof Ir3Label)) {
                 sb.append("  ");
             }
             sb.append(ir3Stmt.toString())
                 .append("\n");
+            ir3Stmt = ir3Stmt.next;
         }
         
         sb.append("}\n\n");
@@ -149,7 +160,19 @@ public class Ir3MdBuilder {
     }
 
     public void buildCFGraph() {
-        
+        cfGraph = new CFGraph();
+
+        List<Pair<String, String>> edges = new ArrayList<>();
+        int bbKey = 0;
+        BasicBlock bb;
+
+        // for (int i = 0; i < ir3Stmts.size(); i++) {
+        //     if (bb == null) {
+        //         bb = new BasicBlock(String.valueOf(bbKey++));
+        //     }
+        //     Ir3Stmt ir3 = ir3Stmts.get(i);
+
+        // }
     }
 
     public void allocRegisters() {
