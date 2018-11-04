@@ -70,4 +70,26 @@ public class BasicBlock extends Node {
     boolean exits() {
         return succs.containsKey(CFGraph.EXIT_KEY);
     }
+
+    // Builds register interference graph
+    void buildRIG(Map<String, Set<String>> rig) {
+        addEdgesForRIG(inState, rig);
+        BasicBlockStmt stmt = firstStmt;
+        while (stmt != null) {
+            addEdgesForRIG(stmt.outState, rig);
+            stmt = stmt.succ;
+        }
+    }
+
+    private void addEdgesForRIG(NodeState state, Map<String, Set<String>> rig) {
+        Set<String> liveSet = state.getAllLive();
+        for (String x : liveSet) {
+            for (String y : liveSet) {
+                if (x != y) {
+                    rig.get(x).add(y);
+                    rig.get(y).add(x);
+                }
+            }
+        }
+    }
 }

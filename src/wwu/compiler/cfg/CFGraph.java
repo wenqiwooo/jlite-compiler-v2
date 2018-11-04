@@ -68,4 +68,20 @@ public class CFGraph {
             }
         }
     }
+
+    public void allocRegisters() {
+        Map<String, Set<String>> rig = new HashMap<>();
+        for (String sym : symbols) {
+            rig.put(sym, new HashSet<>());
+        }
+        basicBlocks.forEach((key, basicBlock) -> {
+            basicBlock.buildRIG(rig);
+        });
+        
+
+        // Set<String> spills = new HashSet<>();
+
+        Map<String, Integer> assignment = GraphOps.colorGraph(rig, 9);
+        System.out.println(assignment);
+    }
 }

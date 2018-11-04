@@ -248,6 +248,7 @@ public class Ir3MdBuilder {
         buildCFGraph();
         LivenessFunction livenessFunc = new LivenessFunction();
         cfGraph.backwardAnalysis(livenessFunc);
+        cfGraph.allocRegisters();
     }
 
     private Set<String> getAllSymbols() {
