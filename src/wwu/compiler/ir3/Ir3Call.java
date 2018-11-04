@@ -1,6 +1,6 @@
 package wwu.compiler.ir3;
 
-import java.util.List;
+import java.util.*;
 
 public class Ir3Call extends Ir3Expr {
     String methodName;
@@ -25,5 +25,12 @@ public class Ir3Call extends Ir3Expr {
         sb.append(")");
 
         return sb.toString();
+    }
+
+    @Override
+    void addUseSymbols(Set<String> symbols) {
+        for (Ir3Id arg : args) {
+            arg.addUseSymbols(symbols);
+        }
     }
 }

@@ -1,5 +1,7 @@
 package wwu.compiler.ir3;
 
+import java.util.*;
+
 import wwu.compiler.common.*;
 
 public class Ir3UnaryExpr extends Ir3BasicExpr {
@@ -14,5 +16,10 @@ public class Ir3UnaryExpr extends Ir3BasicExpr {
     @Override
     public String toString() {
         return operator.toString() + operand.toString();
+    }
+
+    @Override
+    void addUseSymbols(Set<String> symbols) {
+        operand.addUseSymbols(symbols);
     }
 }

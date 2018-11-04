@@ -1,5 +1,7 @@
 package wwu.compiler.ir3;
 
+import java.util.*;
+
 import wwu.compiler.common.*;
 
 public class Ir3BinaryExpr extends Ir3BasicExpr {
@@ -19,5 +21,11 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
                 operand1.toString(), 
                 operator.toString(), 
                 operand2.toString());
+    }
+
+    @Override
+    void addUseSymbols(Set<String> symbols) {
+        operand1.addUseSymbols(symbols);
+        operand2.addUseSymbols(symbols);
     }
 }

@@ -1,5 +1,7 @@
 package wwu.compiler.ir3;
 
+import java.util.HashSet;
+
 import wwu.compiler.common.*;
 
 public class Ir3Literal extends Ir3Id {

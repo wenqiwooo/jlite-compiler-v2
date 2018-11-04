@@ -10,14 +10,17 @@ public abstract class BasicBlockStmt extends Node {
 
     BasicBlock pred;
     BasicBlock succ;
+    Context context;
 
-    public BasicBlockStmt() {
-        
+    public BasicBlockStmt(Context context) {
+        this.context = context;
     }
 
-    // Return list of symbols that are used by this stmt
-    public abstract List<String> getUse();
+    public interface Context {
+        // Return a collection of symbols that are used by this stmt
+        Collection<String> getUse();
 
-    // Return a symbol that is defined by this stmt, if any
-    public abstract String getDef();
+        // Return a symbol that is defined by this stmt, if any
+        String getDef();
+    }
 }
