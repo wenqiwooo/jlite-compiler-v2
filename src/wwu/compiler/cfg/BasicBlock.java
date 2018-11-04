@@ -22,11 +22,26 @@ public class BasicBlock extends Node {
         succs = new HashMap<>();
     }
 
+    public void addStmt(BasicBlockStmt bbStmt) {
+        if (firstStmt == null) {
+            firstStmt = bbStmt;
+        } else {
+            lastStmt.setSucc(bbStmt);
+            bbStmt.setPred(lastStmt);
+        }
+        lastStmt = bbStmt;
+        size++;
+    }
+
     public void addPred(BasicBlock bb) {
         preds.put(bb.key, bb);
     }
 
     public void addSucc(BasicBlock bb) {
         succs.put(bb.key, bb);
+    }
+
+    public String getKey() {
+        return key;
     }
 }

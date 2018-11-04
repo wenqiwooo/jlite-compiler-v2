@@ -191,6 +191,16 @@ public class Ir3Builder {
         return sb.toString();
     }
 
+    public void testOpt() {
+        for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
+            for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
+                for (Ir3MdBuilder mb : mbs.values()) {
+                    mb.buildCFGraph();
+                }
+            }
+        }
+    }
+
     private void addClass(ClassBundle classBundle) throws TypeCheckException {
         // No two classes can be declared in a program with the same name.
         if (classToBuildersMap.containsKey(classBundle.className)) {

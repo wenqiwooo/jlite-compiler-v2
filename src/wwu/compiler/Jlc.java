@@ -19,6 +19,8 @@ class Jlc {
             Ir3Builder ir3 = new Ir3Builder(ast.toClassBundles());
             TypeCheckHelper.checkType(ir3, ast);
             System.out.println(ir3.toCode());
+
+            ir3.testOpt();
         } 
         catch (Exception e) {
             e.printStackTrace();

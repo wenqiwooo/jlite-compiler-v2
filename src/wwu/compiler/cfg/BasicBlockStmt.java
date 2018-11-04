@@ -2,18 +2,26 @@ package wwu.compiler.cfg;
 
 import java.util.*;
 
-public abstract class BasicBlockStmt extends Node {
+public class BasicBlockStmt extends Node {
     BasicBlock basicBlock;
 
     NodeState inState;
     NodeState outState;
 
-    BasicBlock pred;
-    BasicBlock succ;
+    BasicBlockStmt pred;
+    BasicBlockStmt succ;
     Context context;
 
     public BasicBlockStmt(Context context) {
         this.context = context;
+    }
+
+    void setPred(BasicBlockStmt pred) {
+        this.pred = pred;
+    }
+
+    void setSucc(BasicBlockStmt succ) {
+        this.succ = succ;
     }
 
     public interface Context {

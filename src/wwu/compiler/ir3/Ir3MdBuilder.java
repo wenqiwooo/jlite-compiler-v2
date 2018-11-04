@@ -162,17 +162,66 @@ public class Ir3MdBuilder {
     public void buildCFGraph() {
         cfGraph = new CFGraph();
 
-        List<Pair<String, String>> edges = new ArrayList<>();
+        // { pred, succ }
+        List<Pair<String, String>> edgesToAdd = new ArrayList<>();
+        // { bb_key, label }
+        List<Pair<String, String>> gotoLabels = new ArrayList<>();
+        // label -> bb_key
+        Map<String, String> labelToBlockMap = new HashMap<>();
+
         int bbKey = 0;
-        BasicBlock bb;
+        BasicBlock bb = null;
 
-        // for (int i = 0; i < ir3Stmts.size(); i++) {
-        //     if (bb == null) {
-        //         bb = new BasicBlock(String.valueOf(bbKey++));
-        //     }
-        //     Ir3Stmt ir3 = ir3Stmts.get(i);
+        Ir3Stmt stmt = firstStmt;
 
-        // }
+        while (stmt != null) {
+            if (bb == null) {
+                bb = new BasicBlock(String.valueOf(bbKey++));
+            }
+
+            BasicBlockStmt bbStmt = new BasicBlockStmt(stmt);
+            bb.addStmt(bbStmt);
+
+            if (stmt.prev == null) { // First stmt
+                edgesToAdd.add(new Pair<>(CFGraph.ENTRY_KEY, bb.getKey()));
+            }
+            if (stmt.next == null) { // Last stmt
+                edgesToAdd.add(new Pair<>(bb.getKey(), CFGraph.EXIT_KEY));
+            }
+            
+            if (stmt instanceof Ir3Label) { // Block starts with a label
+                labelToBlockMap.put(((Ir3Label)stmt).label, bb.getKey());
+            }
+            else if (stmt instanceof Ir3GotoStmt) { // Unconditional jump
+                gotoLabels.add(new Pair<>(bb.getKey(), ((Ir3GotoStmt)stmt).label));
+            }
+            else if (stmt instanceof Ir3IfGotoStmt) { // Conditional jump
+                gotoLabels.add(new Pair<>(bb.getKey(), ((Ir3IfGotoStmt)stmt).label));
+            }
+
+            if (stmt.next == null ||
+                /* Label begins a new basic block */
+                stmt.next instanceof Ir3Label ||
+                /* Unconditional jump ends a basic block */
+                stmt instanceof Ir3GotoStmt ||
+                /* Conditional jump ends a basic block  */ 
+                stmt instanceof Ir3IfGotoStmt) {
+                cfGraph.addBasicBlock(bb);
+                bb = null;
+            }
+
+            stmt = stmt.next;
+        }
+
+        for (Pair<String, String> gotoPair : gotoLabels) {
+            String predKey = gotoPair.first();
+            String succKey = labelToBlockMap.get(gotoPair.second());
+            edgesToAdd.add(new Pair<>(predKey, succKey));
+        }
+
+        for (Pair<String, String> edge : edgesToAdd) {
+            cfGraph.addEdge(edge.first(), edge.second());
+        }
     }
 
     public void allocRegisters() {
