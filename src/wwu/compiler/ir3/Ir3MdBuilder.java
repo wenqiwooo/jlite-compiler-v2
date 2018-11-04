@@ -147,4 +147,12 @@ public class Ir3MdBuilder {
     public String getParamType(String varName) {
         return params.getOrDefault(varName, null);
     }
+
+    public void buildCFGraph() {
+        
+    }
+
+    public void allocRegisters() {
+
+    }
 }
