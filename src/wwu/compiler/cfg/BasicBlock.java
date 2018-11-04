@@ -12,9 +12,6 @@ public class BasicBlock extends Node {
     Map<String, BasicBlock> preds;
     Map<String, BasicBlock> succs;
 
-    NodeState inState;
-    NodeState outState;
-
     CFGraph graph;
 
     public BasicBlock(String key) {
@@ -72,15 +69,5 @@ public class BasicBlock extends Node {
     // Returns true if basic block exits the function
     boolean exits() {
         return succs.containsKey(CFGraph.EXIT_KEY);
-    }
-
-    // Returns all live-on-in symbols
-    Set<String> getLiveIn() {
-        return inState.getAllLive();
-    }
-
-    // Returns all live-on-out symbols
-    Set<String> getLiveOut() {
-        return outState.getAllLive();
     }
 }

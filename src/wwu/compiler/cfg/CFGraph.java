@@ -61,7 +61,9 @@ public class CFGraph {
             boolean shouldContinue = f.backwardUpdate(bb);
             if (shouldContinue) {
                 for (BasicBlock nextBb : bb.preds.values()) {
-                    stack.add(nextBb);
+                    if (nextBb != entry) {
+                        stack.add(nextBb);
+                    }
                 }
             }
         }

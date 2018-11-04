@@ -97,6 +97,10 @@ public class Ir3MdBuilder {
 
         Ir3Stmt ir3Stmt = firstStmt;
         while (ir3Stmt != null) {
+            sb.append("    In state: ")
+                .append(ir3Stmt.basicBlockStmt.getLiveIn())
+                .append("\n");
+
             sb.append("  ");
             if (!(ir3Stmt instanceof Ir3Label)) {
                 sb.append("  ");
@@ -240,8 +244,10 @@ public class Ir3MdBuilder {
         }
     }
 
-    public void allocRegisters() {
-
+    public void testOpt() {
+        buildCFGraph();
+        LivenessFunction livenessFunc = new LivenessFunction();
+        cfGraph.backwardAnalysis(livenessFunc);
     }
 
     private Set<String> getAllSymbols() {

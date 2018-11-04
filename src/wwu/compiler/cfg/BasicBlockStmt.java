@@ -5,15 +5,13 @@ import java.util.*;
 public class BasicBlockStmt extends Node {
     BasicBlock basicBlock;
 
-    NodeState inState;
-    NodeState outState;
-
     BasicBlockStmt pred;
     BasicBlockStmt succ;
     Context context;
 
     public BasicBlockStmt(Context context) {
         this.context = context;
+        context.setBasicBlockStmt(this);
     }
 
     void setPred(BasicBlockStmt pred) {
@@ -39,5 +37,8 @@ public class BasicBlockStmt extends Node {
 
         // Return a symbol that is defined by this stmt, if any
         String getDef();
+
+        // Passes the basic block stmt to the context
+        void setBasicBlockStmt(BasicBlockStmt basicBlockStmt);
     }
 }

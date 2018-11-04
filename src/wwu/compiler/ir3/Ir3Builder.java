@@ -195,7 +195,7 @@ public class Ir3Builder {
         for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
             for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
                 for (Ir3MdBuilder mb : mbs.values()) {
-                    mb.buildCFGraph();
+                    mb.testOpt();
                 }
             }
         }
