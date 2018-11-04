@@ -160,7 +160,7 @@ public class Ir3MdBuilder {
     }
 
     public void buildCFGraph() {
-        cfGraph = new CFGraph();
+        cfGraph = new CFGraph(getAllSymbols());
 
         // { pred, succ }
         List<Pair<String, String>> edgesToAdd = new ArrayList<>();
@@ -180,15 +180,29 @@ public class Ir3MdBuilder {
             }
 
             BasicBlockStmt bbStmt = new BasicBlockStmt(stmt);
-            bb.addStmt(bbStmt);
+            bb.addBasicBlockStmt(bbStmt);
 
             if (stmt.prev == null) { // First stmt
                 edgesToAdd.add(new Pair<>(CFGraph.ENTRY_KEY, bb.getKey()));
-            }
+            } 
+
             if (stmt.next == null) { // Last stmt
                 edgesToAdd.add(new Pair<>(bb.getKey(), CFGraph.EXIT_KEY));
+            } 
+            else if (stmt instanceof Ir3ReturnStmt) { // Return
+                edgesToAdd.add(new Pair<>(bb.getKey(), CFGraph.EXIT_KEY));
             }
-            
+            else if (stmt instanceof Ir3IfGotoStmt) { 
+                // Current stmt is conditional jump and next stmt is not null,
+                // so possible to get from current stmt to next
+                edgesToAdd.add(new Pair<>(bb.getKey(), String.valueOf(bbKey)));
+            }
+            else if (stmt.next instanceof Ir3Label && 
+                !(stmt instanceof Ir3GotoStmt || stmt instanceof Ir3ReturnStmt)) {
+                // Current stmt is unconditional jump and next stmt is a label
+                edgesToAdd.add(new Pair<>(bb.getKey(), String.valueOf(bbKey)));
+            }
+
             if (stmt instanceof Ir3Label) { // Block starts with a label
                 labelToBlockMap.put(((Ir3Label)stmt).label, bb.getKey());
             }
@@ -205,7 +219,9 @@ public class Ir3MdBuilder {
                 /* Unconditional jump ends a basic block */
                 stmt instanceof Ir3GotoStmt ||
                 /* Conditional jump ends a basic block  */ 
-                stmt instanceof Ir3IfGotoStmt) {
+                stmt instanceof Ir3IfGotoStmt || 
+                /* Return */
+                stmt instanceof Ir3ReturnStmt) {
                 cfGraph.addBasicBlock(bb);
                 bb = null;
             }
@@ -226,5 +242,13 @@ public class Ir3MdBuilder {
 
     public void allocRegisters() {
 
+    }
+
+    private Set<String> getAllSymbols() {
+        Set<String> res = new HashSet<>();
+        res.add("this");
+        params.forEach((name, type) -> res.add(name));
+        localDecls.forEach((name, type) -> res.add(name));
+        return res;
     }
 }

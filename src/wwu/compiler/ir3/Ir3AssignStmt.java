@@ -40,7 +40,7 @@ public class Ir3AssignStmt extends Ir3Stmt {
     }
 
     @Override
-    public Collection<String> getUse() {
+    public Set<String> getUse() {
         return useSymbols;
     }
 }

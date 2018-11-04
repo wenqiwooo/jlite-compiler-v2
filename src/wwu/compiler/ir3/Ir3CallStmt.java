@@ -20,7 +20,7 @@ public class Ir3CallStmt extends Ir3Stmt {
     }
 
     @Override
-    public Collection<String> getUse() {
+    public Set<String> getUse() {
         // TODO: Return all symbols in scope
         return useSymbols;
     }

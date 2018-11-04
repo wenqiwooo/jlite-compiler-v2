@@ -10,8 +10,11 @@ public class CFGraph {
     BasicBlock exit;
 
     Map<String, BasicBlock> basicBlocks;
+    Set<String> symbols;
 
-    public CFGraph() {
+    public CFGraph(Set<String> symbols) {
+        this.symbols = new HashSet<>(symbols);
+
         entry = new BasicBlock(ENTRY_KEY);
         exit = new BasicBlock(EXIT_KEY);
         basicBlocks = new HashMap<>();
@@ -19,6 +22,7 @@ public class CFGraph {
 
     public void addBasicBlock(BasicBlock bb) {
         basicBlocks.put(bb.key, bb);
+        bb.initState(this);
     }
 
     public void addEdge(String predKey, String succKey) {
@@ -33,16 +37,19 @@ public class CFGraph {
         succ.addPred(pred);
     }
 
-    // Forward analysis
+    Set<String> getSymbols() {
+        return symbols;
+    }
 
+    // TODO: Forward analysis
 
     // Backward analysis
     public void backwardAnalysis(TransferFunction f) {
         f.initEntryState(entry);
+        f.initExitState(exit);
         for (BasicBlock bb : basicBlocks.values()) {
             f.initBasicBlockState(bb);
         }
-        f.initExitState(exit);
 
         List<BasicBlock> stack = new ArrayList<>();
         for (BasicBlock bb : exit.preds.values()) {

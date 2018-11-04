@@ -27,8 +27,8 @@ public abstract class Ir3Stmt extends Ir3Base implements BasicBlockStmt.Context 
 
     @Override
     // Return a collection of symbols that are used by this stmt
-    public Collection<String> getUse() {
-        return Collections.emptyList();
+    public Set<String> getUse() {
+        return Collections.emptySet();
     }
 
     @Override

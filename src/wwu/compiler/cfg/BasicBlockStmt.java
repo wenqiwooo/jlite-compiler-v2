@@ -24,9 +24,18 @@ public class BasicBlockStmt extends Node {
         this.succ = succ;
     }
 
+    void initState(NodeState inState, NodeState outState) {
+        this.inState = inState;
+        this.outState = outState;
+    }
+
+    void setBasicBlock(BasicBlock basicBlock) {
+        this.basicBlock = basicBlock;
+    }
+
     public interface Context {
         // Return a collection of symbols that are used by this stmt
-        Collection<String> getUse();
+        Set<String> getUse();
 
         // Return a symbol that is defined by this stmt, if any
         String getDef();

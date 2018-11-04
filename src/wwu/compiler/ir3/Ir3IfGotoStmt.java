@@ -22,7 +22,7 @@ public class Ir3IfGotoStmt extends Ir3Stmt {
     }
 
     @Override
-    public Collection<String> getUse() {
+    public Set<String> getUse() {
         return useSymbols;
     }
 }
