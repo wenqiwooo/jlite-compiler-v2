@@ -13,9 +13,4 @@ public class Ir3Label extends Ir3Stmt {
     public String toString() {
         return "Label " + label + ":";
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }

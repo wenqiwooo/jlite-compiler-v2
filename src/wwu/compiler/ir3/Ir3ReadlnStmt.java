@@ -13,9 +13,4 @@ public class Ir3ReadlnStmt extends Ir3Stmt {
     public String toString() {
         return "readln(" + arg.toString() + ");";
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }

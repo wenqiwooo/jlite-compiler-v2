@@ -147,31 +147,4 @@ public class Ir3MdBuilder {
     public String getParamType(String varName) {
         return params.getOrDefault(varName, null);
     }
-
-    public ArmMd toArmMd(Ir3Builder builder) {
-        ArmMd armMd = new ArmMd();
-
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            armMd.addParam(armObjForVarDeclEntry(
-                    entry, armMd.getNewPseudoRegId()));
-        }
-
-        for (Map.Entry<String, String> entry : localDecls.entrySet()) {
-            armMd.addLocal(armObjForVarDeclEntry(
-                    entry, armMd.getNewPseudoRegId()));
-        }
-
-        for (Ir3Stmt ir3Stmt : ir3Stmts) {
-            ir3Stmt.addToArmMd(armMd);
-        }
-
-        return armMd;
-    }
-
-    // Entry: <name, type>
-    private ArmObj armObjForVarDeclEntry(Map.Entry<String, String> entry, 
-                int pseudoRegId) {
-        ArmMode mode = TypeHelper.getArmModeForType(entry.getValue());
-        return new ArmObj(entry.getKey(), pseudoRegId, mode);
-    }
 }

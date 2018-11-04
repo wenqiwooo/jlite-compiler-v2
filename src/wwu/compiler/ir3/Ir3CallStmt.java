@@ -15,9 +15,4 @@ public class Ir3CallStmt extends Ir3Stmt {
     public String toString() {
         return call.toString() + ";";
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }

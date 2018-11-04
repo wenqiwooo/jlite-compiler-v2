@@ -16,9 +16,4 @@ public class Ir3ReturnStmt extends Ir3Stmt {
         }
         return "return " + arg.toString() + ";"; 
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }

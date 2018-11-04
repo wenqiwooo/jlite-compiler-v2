@@ -13,9 +13,4 @@ public class Ir3GotoStmt extends Ir3Stmt {
     public String toString() {
         return "goto " + label + ";";
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }

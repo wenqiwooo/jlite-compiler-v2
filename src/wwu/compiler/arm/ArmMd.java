@@ -34,4 +34,12 @@ public class ArmMd {
     public int getNewPseudoRegId() {
         return nextPseudoRegId++;
     }
+
+    public ArmObj getArmObjForVarName(String name) {
+        ArmObj obj = localDecls.getOrDefault(name, null);
+        // if (obj == null) {
+        //     obj = params.get(name)
+        // }
+        return obj;
+    }
 }

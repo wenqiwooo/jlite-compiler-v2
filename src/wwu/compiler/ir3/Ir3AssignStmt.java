@@ -19,9 +19,4 @@ public class Ir3AssignStmt extends Ir3Stmt {
     public String toString() {
         return assignee.toString() + " = " + expr.toString() + ";";
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }

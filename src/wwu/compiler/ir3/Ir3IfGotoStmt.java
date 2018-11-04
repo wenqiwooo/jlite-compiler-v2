@@ -15,9 +15,4 @@ public class Ir3IfGotoStmt extends Ir3Stmt {
     public String toString() {
         return String.format("if (%s) goto %s;", pred, label);
     }
-
-    @Override
-    public void addToArmMd(ArmMd armMd) {
-
-    }
 }
