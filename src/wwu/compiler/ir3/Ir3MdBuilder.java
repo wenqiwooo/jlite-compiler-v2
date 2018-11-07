@@ -246,9 +246,11 @@ public class Ir3MdBuilder {
 
     public void testOpt() {
         buildCFGraph();
-        LivenessFunction livenessFunc = new LivenessFunction();
-        cfGraph.backwardAnalysis(livenessFunc);
-        cfGraph.allocRegisters();
+        cfGraph.backwardAnalysis(new LivenessFunction());
+        Pair<Map<String, Integer>, Set<String>> res = cfGraph.allocRegisters(9);
+        Map<String, Integer> regAssignmt = res.first();
+        Set<String> spillVars = res.second();
+        
     }
 
     private Set<String> getAllSymbols() {

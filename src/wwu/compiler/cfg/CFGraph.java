@@ -2,6 +2,8 @@ package wwu.compiler.cfg;
 
 import java.util.*;
 
+import wwu.compiler.util.Pair;
+
 public class CFGraph {
     public static final String ENTRY_KEY = "entry";
     public static final String EXIT_KEY = "exit";
@@ -69,7 +71,43 @@ public class CFGraph {
         }
     }
 
-    public void allocRegisters() {
+    /**
+     * Ensure CFGraph has up-to-date liveness info before calling this.
+     */
+    public Pair<Map<String, Integer>, Set<String>> allocRegisters(int regCount) {
+        Map<String, Set<String>> rig = getRIG();
+        Set<String> spills = new HashSet<>();
+        Map<String, Integer> assignment;
+
+        do {
+            assignment = GraphOps.colorGraph(rig, regCount);
+            
+            if (assignment == null) {
+                String spillVar = null;
+                int nSpillNbrs = 0;
+
+                for (Map.Entry<String, Set<String>> entry : rig.entrySet()) {
+                    String v = entry.getKey();
+                    int nbrCnt = entry.getValue().size();
+                    if (spillVar == null || nbrCnt > nSpillNbrs) {
+                        spillVar = v;
+                        nSpillNbrs = nbrCnt;
+                    }
+                }
+
+                spills.add(spillVar);
+                rig.remove(spillVar);
+                for (Map.Entry<String, Set<String>> entry : rig.entrySet()) {
+                    entry.getValue().remove(spillVar);
+                }
+            }
+        } 
+        while (assignment == null);
+
+        return new Pair<>(assignment, spills);
+    }
+
+    private Map<String, Set<String>> getRIG() {
         Map<String, Set<String>> rig = new HashMap<>();
         for (String sym : symbols) {
             rig.put(sym, new HashSet<>());
@@ -77,11 +115,6 @@ public class CFGraph {
         basicBlocks.forEach((key, basicBlock) -> {
             basicBlock.buildRIG(rig);
         });
-        
-
-        // Set<String> spills = new HashSet<>();
-
-        Map<String, Integer> assignment = GraphOps.colorGraph(rig, 9);
-        System.out.println(assignment);
+        return rig;
     }
 }
