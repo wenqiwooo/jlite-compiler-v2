@@ -285,7 +285,7 @@ public class Ir3MdBuilder {
 
         Ir3Stmt stmt = firstStmt;
         while (stmt != null) {
-            stmt.buildArm(classTypeProvider, armMdBuilder);
+            stmt.buildArm(armMdBuilder, classTypeProvider);
             stmt = stmt.next;
         }
         
@@ -321,6 +321,12 @@ public class Ir3MdBuilder {
                 registerMap.put(reg.getType(), reg);
             }
             return reg;
+        }
+
+        // ip (r12) is used as a temp register
+        // for spilled variables, writes to fields etc.
+        ArmReg getIPReg() {
+            return getReg(ArmRegisterType.REG_IP);
         }
 
         ArmReg getSPReg() {

@@ -43,8 +43,6 @@ public abstract class Ir3Stmt extends Ir3Base implements BasicBlockStmt.Context 
         return next != null;
     }
     
-    void buildArm(ClassTypeProvider classTypeProvider, 
-            Ir3MdBuilder.ArmMdBuilder armMdBuilder) {
-
-    }
+    void buildArm(Ir3MdBuilder.ArmMdBuilder armMdBuilder, 
+            ClassTypeProvider classTypeProvider) {}
 }

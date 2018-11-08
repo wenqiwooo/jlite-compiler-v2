@@ -3,6 +3,7 @@ package wwu.compiler.ir3;
 import java.util.*;
 
 import wwu.compiler.cfg.*;
+import wwu.compiler.arm.*;
 
 public class Ir3AssignStmt extends Ir3Stmt {
     Ir3Id assignee;

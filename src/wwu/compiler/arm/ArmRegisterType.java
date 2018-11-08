@@ -10,13 +10,13 @@ public enum ArmRegisterType {
     REG_6("r6"),
     REG_7("r7"),
     REG_8("r8"),
-    REG_SB("sb"),
-    REG_SL("sl"),
-    REG_FP("fp"),
-    REG_IP("ip"),
-    REG_SP("sp"),
-    REG_LR("lr"),
-    REG_PC("pc");
+    REG_SB("sb"), // r9
+    REG_SL("sl"), // r10
+    REG_FP("fp"), // r11
+    REG_IP("ip"), // r12
+    REG_SP("sp"), // r13
+    REG_LR("lr"), // r14
+    REG_PC("pc"); // r15
 
     // Max number of param registers
     public static final int MAX_PARAM_REGS = 4;
