@@ -10,7 +10,7 @@ import wwu.compiler.exception.ClassNotFoundException;
 import wwu.compiler.exception.TypeCheckException;
 
 
-public class Ir3Builder {
+public class Ir3Builder implements ClassTypeProvider {
     private Map<String, Ir3ClassBuilder> classToBuildersMap;
     private Ir3ClassBuilder currClsBuilder;
     private Ir3MdBuilder currMdBuilder;
@@ -191,14 +191,20 @@ public class Ir3Builder {
         return sb.toString();
     }
 
-    public void testOpt() {
-        for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
-            for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
-                for (Ir3MdBuilder mb : mbs.values()) {
-                    mb.testOpt();
-                }
-            }
-        }
+    @Override
+    public int getClassFieldOffset(String className, String fieldName) {
+        return classToBuildersMap.get(className).getOffsetForField(fieldName);
+    }
+
+    public ArmProgram toArm() {
+        
+        // for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
+        //     for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
+        //         for (Ir3MdBuilder mb : mbs.values()) {
+        //             mb.testOpt();
+        //         }
+        //     }
+        // }
     }
 
     private void addClass(ClassBundle classBundle) throws TypeCheckException {

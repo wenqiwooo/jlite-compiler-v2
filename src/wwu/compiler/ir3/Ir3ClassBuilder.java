@@ -133,6 +133,10 @@ public class Ir3ClassBuilder {
         return mdBuilder.getMethodEncodedName();
     }
 
+    public int getOffsetForField(String fieldName) {
+        return classFieldToOffsetMap.get(fieldName);
+    }
+
     private void addField(Pair<String, String> field) throws TypeCheckException {
         // No two fields in a class can have the same name.
         if (classFieldToTypeMap.containsKey(field.first())) {
