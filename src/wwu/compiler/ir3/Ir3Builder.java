@@ -197,7 +197,7 @@ public class Ir3Builder implements ClassTypeProvider {
     }
 
     public ArmProgram toArm() {
-        
+
         // for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
         //     for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
         //         for (Ir3MdBuilder mb : mbs.values()) {
@@ -205,6 +205,7 @@ public class Ir3Builder implements ClassTypeProvider {
         //         }
         //     }
         // }
+        return null;
     }
 
     private void addClass(ClassBundle classBundle) throws TypeCheckException {

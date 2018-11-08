@@ -98,9 +98,9 @@ public class Ir3MdBuilder {
 
         Ir3Stmt ir3Stmt = firstStmt;
         while (ir3Stmt != null) {
-            sb.append("    In state: ")
-                .append(ir3Stmt.basicBlockStmt.getLiveIn())
-                .append("\n");
+            // sb.append("    In state: ")
+            //     .append(ir3Stmt.basicBlockStmt.getLiveIn())
+            //     .append("\n");
 
             sb.append("  ");
             if (!(ir3Stmt instanceof Ir3Label)) {
@@ -252,9 +252,9 @@ public class Ir3MdBuilder {
         buildCFGraph();
         cfGraph.backwardAnalysis(new LivenessFunction());
         Pair<Map<String, Integer>, Set<String>> res = 
-                cfGraph.allocRegisters(ArmRegister.MAX_ASSIGNABLE);
-        Map<String, Integer> regAssignmt = res.first();
-        Set<String> spillVars = res.second();
+                cfGraph.allocRegisters(ArmRegisterType.MAX_ASSIGNABLE);
+        Map<String, Integer> assignment = res.first();
+        Set<String> spills = res.second();
         
         /**
          * For spill variables, we need to have stack memory allocated for them 
@@ -279,20 +279,23 @@ public class Ir3MdBuilder {
          *   add sp, sp, #<space needed for locals>
          *   ldrfd {non-scratch regs}
          *   ldrfd {fp, pc} // ldrfd {fp}; bx lr if the method does not call other methods
-         * 
-         * Map from variable name to location object?
-         * Interface MdTypeProvider
-         * Location
-         * - reg
-         * - memAddr
          */
 
+        ArmMdBuilder armMdBuilder = new ArmMdBuilder(assignment, spills);
+
+        Ir3Stmt stmt = firstStmt;
+        while (stmt != null) {
+            stmt.buildArm(classTypeProvider, armMdBuilder);
+            stmt = stmt.next;
+        }
+        
         return null;
     }
 
     class ArmMdBuilder {
         Map<String, VarLocation> varToLocationMap;
-        Map<String, ArmReg> registerMap;
+        Map<ArmRegisterType, ArmReg> registerMap;
+        // Variables that are spilled
         Set<String> spills;
         List<ArmInsn> armInsns;
 
@@ -307,129 +310,136 @@ public class Ir3MdBuilder {
             registerMap = new HashMap<>();
             armInsns = new ArrayList<>();
 
-            int cnt = 0;
-            
-            // Set initial locations for parameters
-            for (Map.Entry<String, String> paramEntry : params.entrySet()) {
-                String paramName = paramEntry.getKey();
-                String paramType = paramEntry.getValue();
-                VarLocation loc;
-                if (cnt < 4) {
-                    loc = new VarLocation(paramName, getReg(ArmRegister.getByIdx(cnt)));
-                } else {
-                    // We are using a full descending stack so subtract offset here
-                    ArmMem mem = new ArmMem(getReg(ArmRegister.REG_FP), -paramOffset);
-                    paramOffset += TypeHelper.getArmModeForType(paramType).getSize();
-                    loc = new VarLocation(paramName, mem);
-                }
-                varToLocationMap.put(paramName, loc);
-            }
-
-            Map<Integer, ArmRegister> idxToRegisterMap = new HashMap<>();
-            reassignParamLocations(assignment, idxToRegisterMap);
-
-            for (Map.Entry<String, String> localEntry : localDecls.entrySet()) {
-                String localName = localEntry.getKey();
-                String localType = localEntry.getValue();
-                VarLocation loc;
-
-                if (spills.contains(localName)) { // Spill variable
-                    ArmMem destMem = new ArmMem(getSPReg(), new ArmImmediate(-localOffset));
-                    localOffset += TypeHelper.getArmModeForType(localType).getSize();
-                    loc = new VarLocation(localName, destMem);
-                }
-                else { 
-                    int assignIdx = assignment.get(localName);
-                    ArmRegister reg = idxToRegisterMap.getorDefault(assignIdx, null);
-                    if (reg == null) {
-                        Collection<ArmRegister> usedRegs = idxToRegisterMap.values();
-                        for (int i = 0; i < ArmRegister.MAX_ASSIGNABLE; i++) {
-                            ArmRegister r = ArmRegister.getByIdx(i);
-                            if (!usedRegs.containsKey(r)) {
-                                reg = r;
-                                break;
-                            }
-                        }
-                        idxToRegisterMap.put(assignIdx, reg);
-                    }
-                    loc = new VarLocation(localName, getReg(reg));
-                }
-                varToLocationMap.put(localName, loc);
-            }
-
-            
+            Map<Integer, ArmReg> idxToRegisterMap = new HashMap<>();
+            assignRegisters(assignment, idxToRegisterMap);
         }
 
-        ArmReg getReg(ArmRegister reg) {
-            if (registerMap.containsKey(reg.toString())) {
-                return registerMap.get(reg.toString());
+        ArmReg getReg(ArmRegisterType regType) {
+            ArmReg reg = registerMap.getOrDefault(regType, null);
+            if (reg == null) {
+                reg = new ArmReg(regType);
+                registerMap.put(reg.getType(), reg);
             }
-            ArmReg armReg = new ArmReg(reg);
-            registerMap.put(armReg.getType().toString(), armReg);
-            return armReg;
+            return reg;
+        }
+
+        ArmReg getSPReg() {
+            return getReg(ArmRegisterType.REG_SP);
+        }
+
+        ArmReg getFPReg() {
+            return getReg(ArmRegisterType.REG_FP);
         }
 
         void addInsn(ArmInsn insn) {
             armInsns.add(insn);
         }
 
-        private void reassignParamLocations(Map<String, Integer> assignment, 
-                Map<Integer, ArmRegister> idxToRegisterMap) {
+        private void assignRegisters(Map<String, Integer> assignment, 
+                Map<Integer, ArmReg> idxToRegisterMap) {
+            // Set parameters to their initial locations
+            int cnt = 0;
+            for (Map.Entry<String, String> paramEntry : params.entrySet()) {
+                String paramName = paramEntry.getKey();
+                String paramType = paramEntry.getValue();
+                VarLocation loc;
+
+                if (cnt < ArmRegisterType.MAX_PARAM_REGS) {
+                    ArmReg reg = getReg(ArmRegisterType.getByIdx(cnt));
+                    loc = new VarLocation(paramName, reg);
+                } 
+                else {
+                    ArmImmediate offset = new ArmImmediate(-paramOffset);
+                    // Using a full descending stack so subtract offset here
+                    ArmMem mem = new ArmMem(getFPReg(), offset);
+                    paramOffset += TypeHelper.getSizeForType(paramType);
+                    loc = new VarLocation(paramName, mem);
+                }
+                
+                varToLocationMap.put(paramName, loc);
+                cnt++;
+            }
+
+            // Assign registers to parameters and move them if neccessary
             for (Map.Entry<String, String> paramEntry : params.entrySet()) {
                 String paramName = paramEntry.getKey();
                 String paramType = paramEntry.getValue();
                 VarLocation loc = varToLocationMap.get(paramName);
                 
-                if (!assignment.containsKey(paramName)) { 
-                    // This is a spill.
-                    // If param is in a register, move it to stack
-                    if (loc.inReg()) {
-                        ArmReg srcReg = loc.getReg();
-                        localOffset += TypeHelper.getArmModeForType(paramType).getSize();
-                        ArmMem destMem = new ArmMem(getSPReg(), new ArmImmediate(-localOffset));
-                        addInsn(new ArmStr(destMem, srcReg));
+                if (spills.contains(paramName)) { // Spill
+                    if (loc.inReg()) { // If param is in a register, move it to stack
+                        localOffset += TypeHelper.getSizeForType(paramType);
+                        ArmImmediate offset = new ArmImmediate(-localOffset);
+                        ArmMem destMem = new ArmMem(getSPReg(), offset);
+
+                        addInsn(new ArmStr(destMem, loc.getReg()));
                         loc.updateLocation(destMem);
                     }
-                } 
-                else {
+                }
+                else { // Non-spill
                     int assignIdx = assignment.get(paramName);
-                    ArmRegister reg = idxToRegisterMap.getOrDefault(assignIdx, null);
+                    ArmReg reg = idxToRegisterMap.getOrDefault(assignIdx, null);
+
                     if (loc.inReg()) {
                         // Assign param to the register it was passed in if possible,
                         // otherwise move it to the assigned register
                         if (reg == null) {
-                            reg = loc.getReg();
-                        } 
-                        else if (reg != loc.getReg().getType()) {
-                            ArmReg destReg = getReg(reg);
-                            addInsn(new ArmMov(destReg, loc.getReg()));
-                            loc.updateLocation(destReg);
-                        }
-                    } 
-                    else {
-                        // Param is passed via stack, 
-                        // assign it to a register since it is non-spill
-                        if (reg == null) {
-                            Collection<ArmRegister> usedRegs = idxToRegisterMap.values();
-                            for (int i = 0; i < ArmRegister.MAX_ASSIGNABLE; i++) {
-                                ArmRegister r = ArmRegister.getByIdx(i);
-                                if (!usedRegs.containsKey(r)) {
-                                    reg = r;
-                                    break;
-                                }
-                            }
+                            reg = getNextAvailableReg(idxToRegisterMap);
                             idxToRegisterMap.put(assignIdx, reg);
                         }
-                        ArmReg destReg = getReg(reg);
-                        addInsn(new ArmLdr(destReg, loc.getMem()));
-                        loc.updateLocation(destReg);
+                        if (reg != loc.getReg()) {
+                            addInsn(new ArmMov(reg, loc.getReg()));
+                            loc.updateLocation(reg);
+                        }
+                    }
+                    else {
+                        // Param is passed via stack,
+                        // assign it to a register since it is non-spill
+                        if (reg == null) {
+                            reg = getNextAvailableReg(idxToRegisterMap);
+                            idxToRegisterMap.put(assignIdx, reg);
+                        }
+                        addInsn(new ArmLdr(reg, loc.getMem()));
+                        loc.updateLocation(reg);
                     }
                 }
             }
+
+            // Assign registers, allocate memory for local variables
+            for (Map.Entry<String, String> localEntry : localDecls.entrySet()) {
+                String localName = localEntry.getKey();
+                String localType = localEntry.getValue();
+                VarLocation loc;
+
+                if (spills.contains(localName)) { // Spill variable
+                    localOffset += TypeHelper.getSizeForType(localType);
+                    ArmImmediate offset = new ArmImmediate(-localOffset);
+                    ArmMem destMem = new ArmMem(getSPReg(), offset);
+                    loc = new VarLocation(localName, destMem);
+                }
+                else { 
+                    int assignIdx = assignment.get(localName);
+                    ArmReg reg = idxToRegisterMap.getOrDefault(assignIdx, null);
+                    
+                    if (reg == null) {
+                        reg = getNextAvailableReg(idxToRegisterMap);
+                        idxToRegisterMap.put(assignIdx, reg);
+                    }
+                    loc = new VarLocation(localName, reg);
+                }
+                
+                varToLocationMap.put(localName, loc);
+            }
         }
 
-        private ArmReg getSPReg() {
-            return getReg(ArmRegister.REG_SP);
+        private ArmReg getNextAvailableReg(Map<Integer, ArmReg> idxToRegisterMap) {
+            for (int i = 0; i < ArmRegisterType.MAX_ASSIGNABLE; i++) {
+                ArmReg reg = getReg(ArmRegisterType.getByIdx(i));
+                if (!idxToRegisterMap.containsValue(reg)) {
+                    return reg;
+                }
+            }
+            return null;
         }
     }
 

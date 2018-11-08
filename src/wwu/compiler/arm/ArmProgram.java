@@ -12,17 +12,4 @@ public class ArmProgram {
     public ArmProgram() {
         methods = new ArrayList<>();
     }
-
-    public beginMethod() {
-
-    }
-
-    public endMethod() {
-
-    }
-
-    public addInsn() {
-
-    }
-
 }

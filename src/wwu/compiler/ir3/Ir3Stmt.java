@@ -42,4 +42,9 @@ public abstract class Ir3Stmt extends Ir3Base implements BasicBlockStmt.Context 
     boolean hasNext() {
         return next != null;
     }
+    
+    void buildArm(ClassTypeProvider classTypeProvider, 
+            Ir3MdBuilder.ArmMdBuilder armMdBuilder) {
+
+    }
 }

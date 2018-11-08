@@ -1,6 +1,6 @@
 package wwu.compiler.arm;
 
-public enum ArmRegister {
+public enum ArmRegisterType {
     REG_0("r0"),
     REG_1("r1"),
     REG_2("r2"),
@@ -18,12 +18,14 @@ public enum ArmRegister {
     REG_LR("lr"),
     REG_PC("pc");
 
+    // Max number of param registers
+    public static final int MAX_PARAM_REGS = 4;
     // Max number of assignable registers
     public static final int MAX_ASSIGNABLE = 9;
 
     private String value;
 
-    private ArmRegister(String value) {
+    private ArmRegisterType(String value) {
         this.value = value;
     }
 
@@ -32,7 +34,7 @@ public enum ArmRegister {
         return value;
     }
 
-    public static ArmRegister getByIdx(int idx) {
+    public static ArmRegisterType getByIdx(int idx) {
         switch (idx) {
             case 0:
                 return REG_0;

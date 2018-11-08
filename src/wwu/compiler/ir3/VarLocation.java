@@ -1,6 +1,6 @@
 package wwu.compiler.ir3;
 
-import wwu.compiler.arm.ArmReg;
+import wwu.compiler.arm.*;
 
 class VarLocation {
     String varName;

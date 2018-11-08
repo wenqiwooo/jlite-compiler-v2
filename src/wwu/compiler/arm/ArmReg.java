@@ -3,13 +3,26 @@ package wwu.compiler.arm;
 
 public class ArmReg extends ArmOperand {
 
-    ArmRegister reg;
+    ArmRegisterType regType;
 
-    public ArmReg(ArmRegister reg) {
-        this.reg = reg;
+    public ArmReg(ArmRegisterType regType) {
+        this.regType = regType;
     }
 
-    public ArmRegister getType() {
-        return reg;
+    public ArmRegisterType getType() {
+        return regType;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ArmReg) {
+            return regType == ((ArmReg)obj).regType;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return regType.toString().hashCode();
     }
 }

@@ -43,4 +43,8 @@ public class TypeHelper {
                 return ArmMode.WORD;
         }
     }
+
+    public static int getSizeForType(String type) {
+        return getArmModeForType(type).getSize();
+    }
 }
