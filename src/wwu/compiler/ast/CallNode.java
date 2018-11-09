@@ -41,24 +41,24 @@ public class CallNode extends AtomNode {
     public TypeCheckResult checkType(Ir3Builder env, boolean shouldReduce, String nextLabel) 
             throws TypeCheckException {
         List<String> argTypes = new ArrayList<>();
-        List<Ir3Id> argExprs = new ArrayList<>();
+        List<Ir3BasicId> argExprs = new ArrayList<>();
 
         for (ExprNode exprNode : params) {
             TypeCheckResult resArg = TypeCheckHelper.checkType(env, exprNode, true);
             argTypes.add(resArg.type);
-            argExprs.add((Ir3Id)resArg.ir3Obj);
+            argExprs.add((Ir3BasicId)resArg.ir3Obj);
         }
 
         String parentType = null;
-        Ir3Id parentIr3 = null;
+        Ir3BasicId parentIr3 = null;
         
         if (parent != null) {
             TypeCheckResult resPar = TypeCheckHelper.checkType(env, parent, true);
             parentType = resPar.type;
-            parentIr3 = (Ir3Id)resPar.ir3Obj;
+            parentIr3 = (Ir3BasicId)resPar.ir3Obj;
         } else {
             parentType = env.getCurrentClassType();
-            parentIr3 = new Ir3Identifier("this");
+            parentIr3 = new Ir3Identifier("this", parentType);
         }
 
         String type = env.getReturnTypeForMethod(parentType, name);
@@ -71,7 +71,7 @@ public class CallNode extends AtomNode {
             String tmpVarName = env.cgNewTemporaryName();
             env.cgLocalDecl(tmpVarName, type);
 
-            Ir3Id tmpVar = new Ir3Identifier(tmpVarName);
+            Ir3Id tmpVar = new Ir3Identifier(tmpVarName, type);
             env.cgCode(new Ir3AssignStmt(tmpVar, expr));
 
             return new TypeCheckResult(type, tmpVar, true);

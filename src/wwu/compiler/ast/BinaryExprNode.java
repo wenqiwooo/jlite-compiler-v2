@@ -52,15 +52,15 @@ public class BinaryExprNode extends ExprNode {
             throw new TypeCheckException(errMsg);
         }
 
-        Ir3Id resXExpr = (Ir3Id)resX.ir3Obj;
-        Ir3Id resYExpr = (Ir3Id)resY.ir3Obj;
+        Ir3BasicId resXExpr = (Ir3BasicId)resX.ir3Obj;
+        Ir3BasicId resYExpr = (Ir3BasicId)resY.ir3Obj;
         Ir3BasicExpr expr = new Ir3BinaryExpr(op, resXExpr, resYExpr);
 
         if (shouldReduce) {
             String tmpVarName = env.cgNewTemporaryName();
             env.cgLocalDecl(tmpVarName, type);
 
-            Ir3Id tmpVar = new Ir3Identifier(tmpVarName);
+            Ir3Id tmpVar = new Ir3Identifier(tmpVarName, type);
             env.cgCode(new Ir3AssignStmt(tmpVar, expr));
 
             return new TypeCheckResult(type, tmpVar, true);

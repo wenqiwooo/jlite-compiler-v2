@@ -30,7 +30,7 @@ public class TypeHelper {
             case Type.INT:
                 return ArmMode.WORD;
             case Type.BOOL:
-                return ArmMode.BYTE;
+                return ArmMode.WORD;
             case Type.STRING:
                 return ArmMode.WORD;
             // Should not be allocating for Void and Null.

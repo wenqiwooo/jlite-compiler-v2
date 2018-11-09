@@ -3,6 +3,7 @@ package wwu.compiler.ir3;
 import java.util.*;
 
 import wwu.compiler.cfg.*;
+import wwu.compiler.exception.CodeGenerationException;
 
 public abstract class Ir3Stmt extends Ir3Base implements BasicBlockStmt.Context {
 
@@ -43,6 +44,7 @@ public abstract class Ir3Stmt extends Ir3Base implements BasicBlockStmt.Context 
         return next != null;
     }
     
-    void buildArm(Ir3MdBuilder.ArmMdBuilder armMdBuilder, 
-            ClassTypeProvider classTypeProvider) {}
+    abstract void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+            ClassTypeProvider classTypeProvider) 
+            throws CodeGenerationException;
 }

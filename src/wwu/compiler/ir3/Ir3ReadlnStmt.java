@@ -2,6 +2,9 @@ package wwu.compiler.ir3;
 
 import java.util.*;
 
+import wwu.compiler.arm.*;
+import wwu.compiler.exception.CodeGenerationException;
+
 public class Ir3ReadlnStmt extends Ir3Stmt {
     Ir3Id arg;
     
@@ -25,5 +28,11 @@ public class Ir3ReadlnStmt extends Ir3Stmt {
     @Override
     public String getDef() {
         return defSymbol;
+    }
+
+    @Override
+    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+            ClassTypeProvider classTypeProvider) throws CodeGenerationException {
+        throw new CodeGenerationException("readln() is not supported");
     }
 }

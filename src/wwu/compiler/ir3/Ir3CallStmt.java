@@ -2,6 +2,9 @@ package wwu.compiler.ir3;
 
 import java.util.*;
 
+import wwu.compiler.arm.*;
+import wwu.compiler.exception.*;
+
 public class Ir3CallStmt extends Ir3Stmt {
     Ir3Call call;
     
@@ -23,5 +26,11 @@ public class Ir3CallStmt extends Ir3Stmt {
     public Set<String> getUse() {
         // TODO: Return all symbols in scope
         return useSymbols;
+    }
+
+    @Override
+    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+            throws CodeGenerationException {
+        call.buildArmForAssignStmt(null, mdBuilder, classTypeProvider);
     }
 }

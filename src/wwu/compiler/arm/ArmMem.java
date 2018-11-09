@@ -14,7 +14,7 @@ package wwu.compiler.arm;
  *  - Post-indexed
  * 
  */
-public class ArmMem {
+public class ArmMem extends ArmLoadable {
     public static final int ADDR_MODE_OFFSET = 0;
     public static final int ADDR_MODE_PRE_INDEX = 1;
     public static final int ADDR_MODE_POST_INDEX = 2;
@@ -50,6 +50,10 @@ public class ArmMem {
 
     public ArmMem(ArmReg baseReg, ArmReg offset, ArmImmediate lshift, int addrMode) {
         this(baseReg, offset, lshift, addrMode, OFFSET_FORM_SCALED_REG);
+    }
+
+    public ArmReg getBaseReg() {
+        return baseReg;
     }
 
     private ArmMem(ArmReg baseReg, ArmOperand offset, ArmImmediate lshift, int addrMode, int offsetForm) {

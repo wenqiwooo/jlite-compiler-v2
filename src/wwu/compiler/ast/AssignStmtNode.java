@@ -46,7 +46,7 @@ public class AssignStmtNode extends StmtNode {
             String tmpVarName = env.cgNewTemporaryName();
             env.cgLocalDecl(tmpVarName, resAtom.type);
 
-            Ir3Id tmpVar = new Ir3Identifier(tmpVarName);
+            Ir3Id tmpVar = new Ir3Identifier(tmpVarName, resAtom.type);
             env.cgCode(new Ir3AssignStmt(tmpVar, resAtom.ir3Obj));
 
             assignee = tmpVar;

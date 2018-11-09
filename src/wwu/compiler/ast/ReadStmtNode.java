@@ -37,16 +37,16 @@ public class ReadStmtNode extends StmtNode {
         Ir3Id arg = null;
 
         if (env.isVarClassField(name)) {
-            Ir3Identifier cls = new Ir3Identifier("this");
+            Ir3Identifier cls = new Ir3Identifier("this", type);
             Ir3Id field = new Ir3Field(cls, name);
 
             String tmpVarName = env.cgNewTemporaryName();
             env.cgLocalDecl(tmpVarName, type);
 
-            arg = new Ir3Identifier(tmpVarName);
+            arg = new Ir3Identifier(tmpVarName, type);
             env.cgCode(new Ir3AssignStmt(arg, field));
         } else {
-            arg = new Ir3Identifier(name);
+            arg = new Ir3Identifier(name, type);
         }
         
         env.cgCode(new Ir3ReadlnStmt(arg));

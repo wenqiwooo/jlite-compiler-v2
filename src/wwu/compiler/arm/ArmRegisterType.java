@@ -21,7 +21,7 @@ public enum ArmRegisterType {
     // Max number of param registers
     public static final int MAX_PARAM_REGS = 4;
     // Max number of assignable registers
-    public static final int MAX_ASSIGNABLE = 9;
+    public static final int MAX_ASSIGNABLE = 8;
 
     private String value;
 

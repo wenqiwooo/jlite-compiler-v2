@@ -31,7 +31,7 @@ public class FdNode extends AtomNode {
             String tmpVarName = env.cgNewTemporaryName();
             env.cgLocalDecl(tmpVarName, type);
 
-            Ir3Id tmpVar = new Ir3Identifier(tmpVarName);
+            Ir3Id tmpVar = new Ir3Identifier(tmpVarName, type);
             env.cgCode(new Ir3AssignStmt(tmpVar, expr));
 
             return new TypeCheckResult(type, tmpVar, true);

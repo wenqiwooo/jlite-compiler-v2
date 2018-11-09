@@ -191,9 +191,25 @@ public class Ir3Builder implements ClassTypeProvider {
         return sb.toString();
     }
 
+    // ClassTypeProvider interface
     @Override
     public int getClassFieldOffset(String className, String fieldName) {
         return classToBuildersMap.get(className).getOffsetForField(fieldName);
+    }
+
+    @Override
+    public int getClassSize(String className) {
+        return classToBuildersMap.get(className).getSizeBytes();
+    }
+
+    @Override
+    public String addGlobalLiteral(String value) {
+        return "StrLabel";
+    }
+
+    @Override
+    public String addGlobalLiteral(int value) {
+        return "IntLabel";
     }
 
     public ArmProgram toArm() {

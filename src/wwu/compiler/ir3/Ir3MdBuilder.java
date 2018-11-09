@@ -323,12 +323,6 @@ public class Ir3MdBuilder {
             return reg;
         }
 
-        // ip (r12) is used as a temp register
-        // for spilled variables, writes to fields etc.
-        ArmReg getIPReg() {
-            return getReg(ArmRegisterType.REG_IP);
-        }
-
         ArmReg getSPReg() {
             return getReg(ArmRegisterType.REG_SP);
         }
@@ -337,8 +331,40 @@ public class Ir3MdBuilder {
             return getReg(ArmRegisterType.REG_FP);
         }
 
-        void addInsn(ArmInsn insn) {
+        ArmReg getTempReg1() {
+            return getReg(ArmRegisterType.REG_8);
+        }
+
+        ArmReg getTempReg2() {
+            return getReg(ArmRegisterType.REG_IP);
+        }
+
+        String getMethodExitLabel() {
+            return methodName + "_exit";
+        }
+
+        List<ArmReg> getScratchRegs() {
+            List<ArmReg> res = new ArrayList<>();
+            ArmRegisterType[] scratchRegTypes = {
+                ArmRegisterType.REG_0, 
+                ArmRegisterType.REG_1, 
+                ArmRegisterType.REG_2,
+                ArmRegisterType.REG_3,
+                ArmRegisterType.REG_IP
+            };
+            for (ArmRegisterType regType : scratchRegTypes) {
+                res.add(getReg(regType));
+            }
+            return res;
+        }
+
+        VarLocation getLocationForSymbol(String sym) {
+            return varToLocationMap.getOrDefault(sym, null);
+        }
+
+        ArmMdBuilder addInsn(ArmInsn insn) {
             armInsns.add(insn);
+            return this;
         }
 
         private void assignRegisters(Map<String, Integer> assignment, 
