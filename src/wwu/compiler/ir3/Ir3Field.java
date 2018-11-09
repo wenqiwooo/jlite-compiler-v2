@@ -25,7 +25,7 @@ public class Ir3Field extends Ir3Id {
     }
 
     @Override
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         ArmReg armReg = parent.getArmReg(mdBuilder.getTempReg1(), 
                 mdBuilder, classTypeProvider);

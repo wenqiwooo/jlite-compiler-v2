@@ -30,8 +30,8 @@ public class Ir3IfGotoStmt extends Ir3Stmt {
     }
 
     @Override
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
-            ClassTypeProvider classTypeProvider) throws CodeGenerationException {
+    void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+            throws CodeGenerationException {
         if (pred instanceof Ir3BasicId) {
             ArmReg armReg = ((Ir3BasicId)pred).getArmReg(mdBuilder.getTempReg1(), 
                     mdBuilder, classTypeProvider);

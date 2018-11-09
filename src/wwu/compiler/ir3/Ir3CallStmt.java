@@ -29,7 +29,7 @@ public class Ir3CallStmt extends Ir3Stmt {
     }
 
     @Override
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+    void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
             throws CodeGenerationException {
         call.buildArmForAssignStmt(null, mdBuilder, classTypeProvider);
     }

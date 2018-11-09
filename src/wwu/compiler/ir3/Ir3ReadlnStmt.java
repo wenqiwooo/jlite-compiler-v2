@@ -31,8 +31,8 @@ public class Ir3ReadlnStmt extends Ir3Stmt {
     }
 
     @Override
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
-            ClassTypeProvider classTypeProvider) throws CodeGenerationException {
+    void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+            throws CodeGenerationException {
         throw new CodeGenerationException("readln() is not supported");
     }
 }

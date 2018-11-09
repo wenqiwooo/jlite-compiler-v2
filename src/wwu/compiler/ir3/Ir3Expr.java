@@ -11,8 +11,6 @@ public abstract class Ir3Expr extends Ir3Base {
         // Add a list of the symbols that are used by the expression.
     }
 
-    abstract void buildArmForAssignStmt(ArmReg destReg, 
-            Ir3MdBuilder.ArmMdBuilder mdBuilder, 
-            ClassTypeProvider classTypeProvider) 
-            throws CodeGenerationException;
+    abstract void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
+            ClassTypeProvider classTypeProvider) throws CodeGenerationException;
 }

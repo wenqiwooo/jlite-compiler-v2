@@ -38,7 +38,7 @@ public class Ir3Call extends Ir3Expr {
     }
 
     @Override
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         // Save all scratch registers except for destReg
         List<ArmReg> scratchRegs = mdBuilder.getScratchRegs();

@@ -19,7 +19,7 @@ public class Ir3Constructor extends Ir3Expr {
     }
 
     @Override
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         List<ArmReg> regs = mdBuilder.getScratchRegs();
         regs.remove(destReg);

@@ -30,7 +30,7 @@ public class Ir3Identifier extends Ir3BasicId {
     }
 
     @Override 
-    ArmReg getArmReg(ArmReg backupReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmReg getArmReg(ArmReg backupReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         VarLocation loc = mdBuilder.getLocationForSymbol(varName);
         if (loc.inReg()) {
@@ -43,24 +43,24 @@ public class Ir3Identifier extends Ir3BasicId {
     }
 
     @Override
-    ArmReg tryGetArmReg(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmReg tryGetArmReg(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         return getArmReg(null, mdBuilder, classTypeProvider);
     }
 
     @Override
-    ArmOperand getArmOperand(ArmReg backupReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmOperand getArmOperand(ArmReg backupReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         return getArmReg(backupReg, mdBuilder, classTypeProvider);
     }
 
     @Override
-    ArmOperand tryGetArmOperand(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmOperand tryGetArmOperand(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         return tryGetArmReg(mdBuilder, classTypeProvider);
     }
 
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         ArmReg src = getArmReg(mdBuilder.getTempReg1(), 
                 mdBuilder, classTypeProvider);

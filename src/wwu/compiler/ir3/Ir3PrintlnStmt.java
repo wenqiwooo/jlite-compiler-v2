@@ -28,7 +28,7 @@ public class Ir3PrintlnStmt extends Ir3Stmt {
     }
 
     @Override
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+    void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
             throws CodeGenerationException {
         String argType = arg.getType();
         ArmReg r0 = mdBuilder.getReg(ArmRegisterType.REG_0);

@@ -29,7 +29,7 @@ public class Ir3Literal extends Ir3BasicId {
     }
 
     @Override
-    ArmReg getArmReg(ArmReg backupReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmReg getArmReg(ArmReg backupReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         ArmOperand armOperand = getArmOperand(backupReg, mdBuilder, classTypeProvider);
         if (armOperand instanceof ArmReg) {
@@ -41,7 +41,7 @@ public class Ir3Literal extends Ir3BasicId {
     }
 
     @Override
-    ArmReg tryGetArmReg(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmReg tryGetArmReg(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         ArmOperand armOperand = tryGetArmOperand(mdBuilder, classTypeProvider);
         if (armOperand != null && armOperand instanceof ArmReg) {
@@ -51,7 +51,7 @@ public class Ir3Literal extends Ir3BasicId {
     }
 
     @Override
-    ArmOperand getArmOperand(ArmReg backupReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmOperand getArmOperand(ArmReg backupReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         if (valueType.equals(Type.BOOL)) {
             return new ArmImmediate((boolean)value ? 1 : 0);
@@ -78,13 +78,13 @@ public class Ir3Literal extends Ir3BasicId {
     }
 
     @Override
-    ArmOperand tryGetArmOperand(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    ArmOperand tryGetArmOperand(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         return getArmOperand(null, mdBuilder, classTypeProvider);
     }
 
     @Override
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         getArmReg(destReg, mdBuilder, classTypeProvider);
     }

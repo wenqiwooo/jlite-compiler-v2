@@ -26,7 +26,7 @@ public class Ir3UnaryExpr extends Ir3BasicExpr {
     }
 
     @Override
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         mdBuilder.addInsn(new ArmMov(mdBuilder.getTempReg1(), new ArmImmediate(0)));
         ArmReg armReg = operand.getArmReg(mdBuilder.getTempReg2(), 

@@ -31,7 +31,7 @@ public class Ir3ReturnStmt extends Ir3Stmt {
     }
 
     @Override
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+    void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
             throws CodeGenerationException {
         if (arg != null) {
             ArmReg r0 = mdBuilder.getReg(ArmRegisterType.REG_0);

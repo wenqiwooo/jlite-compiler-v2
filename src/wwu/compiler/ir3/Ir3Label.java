@@ -2,7 +2,6 @@ package wwu.compiler.ir3;
 
 import wwu.compiler.arm.*;
 import wwu.compiler.exception.CodeGenerationException;
-import wwu.compiler.ir3.Ir3MdBuilder.ArmMdBuilder;
 
 public class Ir3Label extends Ir3Stmt {
     String label;

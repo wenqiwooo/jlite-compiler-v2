@@ -31,7 +31,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
         operand2.addUseSymbols(symbols);
     }
 
-    void buildArmForIfGotoStmt(String label, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForIfGotoStmt(String label, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         ArmCondition cond = armCondForRelOp(operator);
         
@@ -45,7 +45,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
     }
 
     @Override
-    void buildArmForAssignStmt(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         if (operator.isArithmetic()) {
             armForArithExprAssign(destReg, mdBuilder, classTypeProvider);
@@ -58,7 +58,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
         }
     }
 
-    private void armForArithExprAssign(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    private void armForArithExprAssign(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         ArmReg armReg = operand1.getArmReg(mdBuilder.getTempReg1(), 
                 mdBuilder, classTypeProvider);
@@ -73,7 +73,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
         mdBuilder.addInsn(new ArmArithOp(armOp, destReg, armReg, armOperand));
     }
 
-    private void armForRelExprAssign(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    private void armForRelExprAssign(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         ArmReg armReg1 = operand1.getArmReg(mdBuilder.getTempReg1(), 
                 mdBuilder, classTypeProvider);
@@ -88,7 +88,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
                 .addInsn(new ArmMov(destReg, new ArmImmediate(0), elseCond));
     }
 
-    private void armForBoolExprAssign(ArmReg destReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    private void armForBoolExprAssign(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         ArmReg armReg1 = operand1.getArmReg(destReg, mdBuilder, classTypeProvider);
         if (armReg1 != destReg) {

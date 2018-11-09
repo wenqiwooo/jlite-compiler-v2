@@ -43,7 +43,7 @@ public class Ir3AssignStmt extends Ir3Stmt {
     }
 
     @Override
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    void buildArm(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         if (assignee instanceof Ir3Identifier) {
             VarLocation loc = mdBuilder.getLocationForSymbol(

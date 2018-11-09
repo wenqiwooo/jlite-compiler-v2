@@ -26,16 +26,16 @@ public abstract class Ir3BasicId extends Ir3Id {
      * 
      */
 
-    abstract ArmReg getArmReg(ArmReg backupReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    abstract ArmReg getArmReg(ArmReg backupReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider);
 
-    abstract ArmReg tryGetArmReg(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    abstract ArmReg tryGetArmReg(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider);
 
-    abstract ArmOperand getArmOperand(ArmReg backupReg, Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    abstract ArmOperand getArmOperand(ArmReg backupReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider);
 
-    abstract ArmOperand tryGetArmOperand(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
+    abstract ArmOperand tryGetArmOperand(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider);
     
     abstract String getType();

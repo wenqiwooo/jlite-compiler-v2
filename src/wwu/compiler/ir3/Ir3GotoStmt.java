@@ -15,8 +15,8 @@ public class Ir3GotoStmt extends Ir3Stmt {
         return "goto " + label + ";";
     }
 
-    void buildArm(Ir3MdBuilder.ArmMdBuilder mdBuilder, 
-            ClassTypeProvider classTypeProvider) throws CodeGenerationException {
+    void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
+            throws CodeGenerationException {
         mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.B, label));
     }
 }
