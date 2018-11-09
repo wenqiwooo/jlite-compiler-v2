@@ -1,14 +1,10 @@
 package wwu.compiler.ir3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import wwu.compiler.arm.*;
 import wwu.compiler.common.*;
 import wwu.compiler.exception.*;
-import wwu.compiler.ir3.Ir3MdBuilder;
 import wwu.compiler.util.Pair;
 
 public class Ir3ClassBuilder {
@@ -135,6 +131,16 @@ public class Ir3ClassBuilder {
 
     public int getOffsetForField(String fieldName) {
         return classFieldToOffsetMap.get(fieldName);
+    }
+
+    List<ArmMd> getArmMds(ClassTypeProvider classTypeProvider) {
+        List<ArmMd> res = new ArrayList<>();
+        for (Map<String, Ir3MdBuilder> mbs : methodToBuildersMap.values()) {
+            for (Ir3MdBuilder mb : mbs.values()) {
+                res.add(mb.getArmMd(classTypeProvider));
+            }
+        }
+        return res;
     }
 
     private void addField(Pair<String, String> field) throws TypeCheckException {

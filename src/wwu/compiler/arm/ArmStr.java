@@ -5,24 +5,37 @@ import java.util.*;
 public class ArmStr extends ArmInsn {
     // If destMem is null, this is a push operation
     ArmMem destMem;
-    List<ArmReg> srcRegs;
+    ArmReg srcReg;
 
     public ArmStr(ArmMem destMem, ArmReg srcReg) {
         this.destMem = destMem;
-        this.srcRegs = new ArrayList<>();
-        this.srcRegs.add(srcReg);
-    }
-
-    public ArmStr(ArmMem destMem, List<ArmReg> srcRegs) {
-        this.destMem = destMem;
-        this.srcRegs = srcRegs;
+        this.srcReg = srcReg;
     }
 
     public static ArmStr push(ArmReg srcReg) {
         return new ArmStr(null, srcReg);
     }
 
-    public static ArmStr push(List<ArmReg> srcRegs) {
-        return new ArmStr(null, srcRegs);
+    private boolean isPush() {
+        return destMem == null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        if (isPush()) {
+            sb.append("push ")
+                .append(srcReg)
+                .append("\n");
+        } else {
+            sb.append("str ")
+                .append(srcReg.toString())
+                .append(",")
+                .append(destMem.toString())
+                .append("\n");
+        }
+
+        return sb.toString();
     }
 }

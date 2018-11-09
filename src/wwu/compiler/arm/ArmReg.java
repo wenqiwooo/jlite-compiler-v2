@@ -25,4 +25,9 @@ public class ArmReg extends ArmOperand {
     public int hashCode() {
         return regType.toString().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return regType.toString();
+    }
 }

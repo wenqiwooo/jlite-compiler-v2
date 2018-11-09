@@ -35,7 +35,7 @@ public class Ir3PrintlnStmt extends Ir3Stmt {
 
         // Save scratch registers
         List<ArmReg> scratchRegs = mdBuilder.getScratchRegs();
-        mdBuilder.addInsn(ArmStr.push(scratchRegs));
+        mdBuilder.addInsn(ArmStm.push(scratchRegs));
 
         if (argType.equals(Type.STRING)) {
             ArmReg armReg = arg.getArmReg(r0, mdBuilder, classTypeProvider);
@@ -56,6 +56,6 @@ public class Ir3PrintlnStmt extends Ir3Stmt {
         }
 
         mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.BL, "printf(PLT)"))
-                .addInsn(ArmLdr.pop(scratchRegs));
+                .addInsn(ArmLdm.pop(scratchRegs));
     }
 }

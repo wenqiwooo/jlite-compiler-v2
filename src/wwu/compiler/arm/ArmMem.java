@@ -63,4 +63,23 @@ public class ArmMem extends ArmLoadable {
         this.addrMode = addrMode;
         this.offsetForm = offsetForm;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("[")
+            .append(baseReg.toString());
+        if (offset != null) {
+            sb.append(",")
+                .append(offset.toString());
+        }
+        if (lshift != null) {
+            sb.append(",LSL")
+                .append(lshift.toString());
+        }
+        sb.append("]");
+
+        return sb.toString();
+    }
 }

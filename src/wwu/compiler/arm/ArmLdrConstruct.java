@@ -6,4 +6,9 @@ public class ArmLdrConstruct extends ArmLoadable {
     public ArmLdrConstruct(String ref) {
         this.ref = ref;
     }
+
+    @Override
+    public String toString() {
+        return "=" + ref;
+    }
 }

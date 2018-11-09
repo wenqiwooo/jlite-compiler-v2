@@ -14,4 +14,21 @@ public class ArmMov extends ArmInsn {
         this.src = src;
         this.cond = cond;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("mov");
+        if (cond != null) {
+            sb.append(cond.toString());
+        }
+        sb.append(" ")
+            .append(destReg.toString())
+            .append(",")
+            .append(src.toString())
+            .append("\n");
+
+        return sb.toString();
+    }
 }

@@ -7,8 +7,19 @@ public class ArmBoolOp extends ArmInsn {
     ArmReg srcReg;
 
     public enum Operator {
-        AND,
-        ORR;
+        AND("and"),
+        ORR("orr");
+
+        private String value;
+
+        private Operator(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
     Operator operator;
@@ -18,5 +29,17 @@ public class ArmBoolOp extends ArmInsn {
         this.operator = operator;
         this.destReg = destReg;
         this.srcReg = srcReg;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(operator.toString())
+            .append(" ")
+            .append(destReg.toString())
+            .append(",")
+            .append(srcReg.toString())
+            .append("\n");
+        return sb.toString();
     }
 }

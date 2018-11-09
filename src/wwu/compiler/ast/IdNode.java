@@ -21,7 +21,7 @@ public class IdNode extends AtomNode {
         String type = env.getTypeForVar(name);
 
         if (env.isVarClassField(name)) {
-            Ir3Identifier parent = new Ir3Identifier("this", type);
+            Ir3Identifier parent = new Ir3Identifier("this", env.getCurrentClassType());
             Ir3Expr expr = new Ir3Field(parent, name);
             
             if (shouldReduce) {

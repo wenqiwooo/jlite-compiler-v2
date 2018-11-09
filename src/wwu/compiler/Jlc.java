@@ -20,9 +20,11 @@ class Jlc {
             Ir3Builder ir3 = new Ir3Builder(ast.toClassBundles());
             TypeCheckHelper.checkType(ir3, ast);
 
-            ArmProgram armProgram = ir3.toArm();
+            ArmProgram armProgram = ir3.getArmProgram();
 
-            System.out.println(ir3.toCode());
+            // System.out.println(ir3.toCode());
+
+            System.out.println(armProgram.toString());
         } 
         catch (Exception e) {
             e.printStackTrace();

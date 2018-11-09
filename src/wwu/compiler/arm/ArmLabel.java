@@ -6,4 +6,9 @@ public class ArmLabel extends ArmInsn {
     public ArmLabel(String label) {
         this.label = label;
     }
+
+    @Override
+    public String toString() {
+        return label + ":\n";
+    }
 }

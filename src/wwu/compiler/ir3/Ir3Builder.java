@@ -10,7 +10,7 @@ import wwu.compiler.exception.ClassNotFoundException;
 import wwu.compiler.exception.TypeCheckException;
 
 
-public class Ir3Builder implements ClassTypeProvider {
+public class Ir3Builder {
     private Map<String, Ir3ClassBuilder> classToBuildersMap;
     private Ir3ClassBuilder currClsBuilder;
     private Ir3MdBuilder currMdBuilder;
@@ -191,37 +191,57 @@ public class Ir3Builder implements ClassTypeProvider {
         return sb.toString();
     }
 
-    // ClassTypeProvider interface
-    @Override
-    public int getClassFieldOffset(String className, String fieldName) {
-        return classToBuildersMap.get(className).getOffsetForField(fieldName);
+    public ArmProgram getArmProgram() {
+        ArmProgram armProgram = new ArmProgram();
+        Provider provider = new Provider();
+
+        for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
+            armProgram.addMethods(cb.getArmMds(provider));
+        }
+
+        return armProgram;
     }
 
-    @Override
-    public int getClassSize(String className) {
-        return classToBuildersMap.get(className).getSizeBytes();
-    }
+    class Provider implements ClassTypeProvider {
+        Map<String, String> strLiterals;
+        Map<Integer, String> intLiterals;
 
-    @Override
-    public String addGlobalLiteral(String value) {
-        return "StrLabel";
-    }
+        int nextLabelIdx = 0;
 
-    @Override
-    public String addGlobalLiteral(int value) {
-        return "IntLabel";
-    }
+        Provider() {
+            strLiterals = new HashMap<>();
+            intLiterals = new HashMap<>();
+        }
 
-    public ArmProgram toArm() {
+        @Override
+        public int getClassFieldOffset(String className, String fieldName) {
+            return classToBuildersMap.get(className).getOffsetForField(fieldName);
+        }
 
-        // for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
-        //     for (Map<String, Ir3MdBuilder> mbs : cb.methodToBuildersMap.values()) {
-        //         for (Ir3MdBuilder mb : mbs.values()) {
-        //             mb.testOpt();
-        //         }
-        //     }
-        // }
-        return null;
+        @Override
+        public int getClassSize(String className) {
+            return classToBuildersMap.get(className).getSizeBytes();
+        }
+
+        @Override
+        public String addGlobalLiteral(String value) {
+            String label = strLiterals.getOrDefault(value, null);
+            if (label == null) {
+                label = "S_LITERAL_" + nextLabelIdx++;
+                strLiterals.put(value, label);
+            }
+            return label;
+        }
+
+        @Override
+        public String addGlobalLiteral(int value) {
+            String label = intLiterals.getOrDefault(value, null);
+            if (label == null) {
+                label = "I_LITERAL_" + nextLabelIdx++;
+                intLiterals.put(value, label);
+            }
+            return label;
+        }
     }
 
     private void addClass(ClassBundle classBundle) throws TypeCheckException {

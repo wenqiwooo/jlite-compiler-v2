@@ -45,7 +45,7 @@ public class Ir3Call extends Ir3Expr {
         if (destReg != null) {
             scratchRegs.remove(destReg);
         }
-        mdBuilder.addInsn(ArmStr.push(scratchRegs));
+        mdBuilder.addInsn(ArmStm.push(scratchRegs));
         
         // Push all parameters to the stack in reverse order.
         for (int i = args.size() - 1; i >= 0; i--) {
@@ -81,6 +81,6 @@ public class Ir3Call extends Ir3Expr {
         }
 
         // Restore sratch registers
-        mdBuilder.addInsn(ArmLdr.pop(scratchRegs));
+        mdBuilder.addInsn(ArmLdm.pop(scratchRegs));
     }
 }

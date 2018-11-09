@@ -1,12 +1,23 @@
 package wwu.compiler.arm;
 
 public enum ArmCondition {
-    EQ,
-    NE,
-    GT,
-    LT,
-    GE,
-    LE;
+    EQ("eq"),
+    NE("ne"),
+    GT("gt"),
+    LT("lt"),
+    GE("ge"),
+    LE("le");
+
+    private String value;
+
+    private ArmCondition(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
 
     public ArmCondition getInverse() {
         switch (this) {

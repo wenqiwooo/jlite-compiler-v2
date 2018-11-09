@@ -8,9 +8,20 @@ public class ArmArithOp extends ArmInsn {
     ArmOperand srcOperand;
 
     public enum Operator {
-        ADD,
-        SUB,
-        MUL;
+        ADD("add"),
+        SUB("sub"),
+        MUL("mul");
+
+        private String value;
+
+        private Operator(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
     Operator operator;
@@ -24,5 +35,21 @@ public class ArmArithOp extends ArmInsn {
         if (this.operator == Operator.MUL && !(srcOperand instanceof ArmReg)) {
             throw new CodeGenerationException("Second operand must be a register");
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(operator.toString())
+            .append(" ")
+            .append(destReg.toString())
+            .append(",")
+            .append(srcReg.toString())
+            .append(",")
+            .append(srcOperand.toString())
+            .append("\n");
+        
+        return sb.toString();
     }
 }

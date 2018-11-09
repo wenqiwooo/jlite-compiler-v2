@@ -23,7 +23,7 @@ public class Ir3Constructor extends Ir3Expr {
             ClassTypeProvider classTypeProvider) {
         List<ArmReg> regs = mdBuilder.getScratchRegs();
         regs.remove(destReg);
-        mdBuilder.addInsn(ArmStr.push(regs));
+        mdBuilder.addInsn(ArmStm.push(regs));
 
         ArmReg r0 = mdBuilder.getReg(ArmRegisterType.REG_0);
         ArmOperand allocSize = new ArmImmediate(classTypeProvider.getClassSize(type));
@@ -31,6 +31,6 @@ public class Ir3Constructor extends Ir3Expr {
         mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.BL, ALLOC_BL_TARGET));
         mdBuilder.addInsn(new ArmMov(destReg, r0));
         
-        mdBuilder.addInsn(ArmLdr.pop(regs));
+        mdBuilder.addInsn(ArmLdm.pop(regs));
     }
 }

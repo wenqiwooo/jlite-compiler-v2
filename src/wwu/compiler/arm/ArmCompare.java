@@ -9,4 +9,17 @@ public class ArmCompare extends ArmInsn {
         this.reg = reg;
         this.operand = operand;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("cmp ")
+            .append(reg.toString())
+            .append(",")
+            .append(operand.toString())
+            .append("\n");
+
+        return sb.toString();
+    }
 }

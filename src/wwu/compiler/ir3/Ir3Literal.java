@@ -57,7 +57,7 @@ public class Ir3Literal extends Ir3BasicId {
             return new ArmImmediate((boolean)value ? 1 : 0);
         }
         
-        if (value.equals(Type.INT)) {
+        if (valueType.equals(Type.INT)) {
             if (ArmHelper.isValidDataImmediate(value)) {
                 return new ArmImmediate((int)value);
             }

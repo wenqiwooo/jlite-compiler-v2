@@ -5,7 +5,7 @@ import java.util.*;
 import wwu.compiler.arm.*;
 import wwu.compiler.cfg.*;
 import wwu.compiler.common.*;
-import wwu.compiler.exception.MethodParamRedeclaredException;
+import wwu.compiler.exception.*;
 import wwu.compiler.util.Pair;
 
 public class Ir3MdBuilder {
@@ -248,7 +248,7 @@ public class Ir3MdBuilder {
     /**
      * 
      */
-    public ArmMd toArm(ClassTypeProvider classTypeProvider) {
+    public ArmMd getArmMd(ClassTypeProvider classTypeProvider) {
         buildCFGraph();
         cfGraph.backwardAnalysis(new LivenessFunction());
         Pair<Map<String, Integer>, Set<String>> res = 
@@ -281,15 +281,15 @@ public class Ir3MdBuilder {
          *   ldrfd {fp, pc} // ldrfd {fp}; bx lr if the method does not call other methods
          */
 
-        ArmMdBuilder armMdBuilder = new ArmMdBuilder(assignment, spills);
+        ArmMdBuilder mdBuilder = new ArmMdBuilder(assignment, spills);
 
         Ir3Stmt stmt = firstStmt;
         while (stmt != null) {
-            stmt.buildArm(armMdBuilder, classTypeProvider);
+            stmt.buildArm(mdBuilder, classTypeProvider);
             stmt = stmt.next;
         }
-        
-        return null;
+
+        return mdBuilder.build();
     }
 
     class ArmMdBuilder {
@@ -297,10 +297,13 @@ public class Ir3MdBuilder {
         Map<ArmRegisterType, ArmReg> registerMap;
         // Variables that are spilled
         Set<String> spills;
-        List<ArmInsn> armInsns;
+
+        ArmInsn firstInsn;
+        ArmInsn lastInsn;
 
         // Offset for parameters
-        int paramOffset = 0;
+        // lr, fp, r4, r5, r6, r7, r8 are saved above parameters
+        int paramOffset = 7 * 4;
         // Offset for locals
         int localOffset = 0;
 
@@ -308,10 +311,40 @@ public class Ir3MdBuilder {
             this.spills = spills;
             varToLocationMap = new HashMap<>();
             registerMap = new HashMap<>();
-            armInsns = new ArrayList<>();
 
             Map<Integer, ArmReg> idxToRegisterMap = new HashMap<>();
             assignRegisters(assignment, idxToRegisterMap);
+
+            // Detach existing arm insns
+            ArmInsn procedureStart = firstInsn;
+            firstInsn = null;
+            lastInsn = null;
+
+            // Add prologue
+            List<ArmReg> nonScratchRegs = getNonScratchRegs();
+            addInsn(ArmStm.push(Arrays.asList(getFPReg(), getLRReg())));
+            addInsn(ArmStm.push(nonScratchRegs));
+            addInsn(new ArmMov(getFPReg(), getSPReg()));
+            addInsn(new ArmArithOp(ArmArithOp.Operator.SUB, getSPReg(), 
+                    getSPReg(), new ArmImmediate(localOffset)));
+
+            // Reattach arm insns
+            if (procedureStart != null) {
+                addInsn(procedureStart);
+            }
+        }
+
+        // Never call this twice
+        ArmMd build() {
+            // Add epilogue
+            addInsn(new ArmLabel(getMethodExitLabel()));
+            addInsn(new ArmArithOp(ArmArithOp.Operator.ADD, getSPReg(),
+                    getSPReg(), new ArmImmediate(localOffset)));
+            List<ArmReg> nonScratchRegs = getNonScratchRegs();
+            addInsn(ArmLdm.pop(nonScratchRegs));
+            addInsn(ArmLdm.pop(Arrays.asList(getFPReg(), getPCReg())));
+            
+            return new ArmMd(methodName, firstInsn);
         }
 
         ArmReg getReg(ArmRegisterType regType) {
@@ -329,6 +362,14 @@ public class Ir3MdBuilder {
 
         ArmReg getFPReg() {
             return getReg(ArmRegisterType.REG_FP);
+        }
+
+        ArmReg getLRReg() {
+            return getReg(ArmRegisterType.REG_LR);
+        }
+
+        ArmReg getPCReg() {
+            return getReg(ArmRegisterType.REG_PC);
         }
 
         ArmReg getTempReg1() {
@@ -358,12 +399,47 @@ public class Ir3MdBuilder {
             return res;
         }
 
+        List<ArmReg> getNonScratchRegs() {
+            List<ArmReg> res = new ArrayList<>();
+            ArmRegisterType[] nonScratchRegTypes = {
+                ArmRegisterType.REG_4,
+                ArmRegisterType.REG_5,
+                ArmRegisterType.REG_6,
+                ArmRegisterType.REG_7,
+                ArmRegisterType.REG_8
+            };
+            for (ArmRegisterType regType : nonScratchRegTypes) {
+                res.add(getReg(regType));
+            }
+            return res;
+        }
+
         VarLocation getLocationForSymbol(String sym) {
             return varToLocationMap.getOrDefault(sym, null);
         }
 
+        ArmMdBuilder prependInsn(ArmInsn insn) {
+            if (firstInsn == null) {
+                addInsn(insn);
+            } else {
+                insn.setNext(firstInsn);
+                firstInsn.setPrev(insn);
+                firstInsn = insn;
+            }
+            return this;
+        }
+
         ArmMdBuilder addInsn(ArmInsn insn) {
-            armInsns.add(insn);
+            if (firstInsn == null) {
+                firstInsn = insn;
+            } else {
+                lastInsn.setNext(insn);
+                insn.setPrev(lastInsn);
+            }
+            lastInsn = insn;
+            while (lastInsn.next != null) {
+                lastInsn = lastInsn.next;
+            }
             return this;
         }
 
@@ -381,7 +457,7 @@ public class Ir3MdBuilder {
                     loc = new VarLocation(paramName, reg);
                 } 
                 else {
-                    ArmImmediate offset = new ArmImmediate(-paramOffset);
+                    ArmImmediate offset = new ArmImmediate(paramOffset);
                     // Using a full descending stack so subtract offset here
                     ArmMem mem = new ArmMem(getFPReg(), offset);
                     paramOffset += TypeHelper.getSizeForType(paramType);
@@ -402,7 +478,7 @@ public class Ir3MdBuilder {
                     if (loc.inReg()) { // If param is in a register, move it to stack
                         localOffset += TypeHelper.getSizeForType(paramType);
                         ArmImmediate offset = new ArmImmediate(-localOffset);
-                        ArmMem destMem = new ArmMem(getSPReg(), offset);
+                        ArmMem destMem = new ArmMem(getFPReg(), offset);
 
                         addInsn(new ArmStr(destMem, loc.getReg()));
                         loc.updateLocation(destMem);
@@ -446,7 +522,7 @@ public class Ir3MdBuilder {
                 if (spills.contains(localName)) { // Spill variable
                     localOffset += TypeHelper.getSizeForType(localType);
                     ArmImmediate offset = new ArmImmediate(-localOffset);
-                    ArmMem destMem = new ArmMem(getSPReg(), offset);
+                    ArmMem destMem = new ArmMem(getFPReg(), offset);
                     loc = new VarLocation(localName, destMem);
                 }
                 else { 
