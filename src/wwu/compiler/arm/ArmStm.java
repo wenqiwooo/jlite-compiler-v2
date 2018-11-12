@@ -25,7 +25,7 @@ public class ArmStm extends ArmInsn {
         StringBuilder sb = new StringBuilder();
 
         if (isPush()) {
-            sb.append("push ");
+            sb.append("stmfd sp!,");
         } else {
             sb.append("stm ")
                 .append(destReg.toString())

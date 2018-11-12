@@ -40,5 +40,9 @@ public class BasicBlockStmt extends Node {
 
         // Passes the basic block stmt to the context
         void setBasicBlockStmt(BasicBlockStmt basicBlockStmt);
+
+        // This should return true if the stmt may result in additional unknown
+        // side effects that are not reflected by it.
+        boolean hasAdditionalSideEffects();
     }
 }

@@ -22,13 +22,19 @@ public class ArmMd {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(methodName)
+            .append(":\n");
 
         ArmInsn insn = firstInsn;
         while (insn != null) {
+            if (insn instanceof ArmLabel) {
+                sb.append("\n");
+            }
             sb.append(insn.toString());
             insn = insn.next;
         }
 
+        sb.append("\n");
         return sb.toString();
     }
 }

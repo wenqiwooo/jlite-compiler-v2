@@ -7,7 +7,6 @@ import wwu.compiler.exception.*;
 
 public class Ir3CallStmt extends Ir3Stmt {
     Ir3Call call;
-    
     Set<String> useSymbols;
 
     public Ir3CallStmt(Ir3Call call) {
@@ -23,10 +22,14 @@ public class Ir3CallStmt extends Ir3Stmt {
     }
 
     @Override
-    public Set<String> getUse() {
-        // TODO: Return all symbols in scope
+    public Set<String> getUse() {   
         return useSymbols;
     }
+
+    // @Override
+    // public boolean hasAdditionalSideEffects() {
+    //     return true;
+    // }
 
     @Override
     void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 

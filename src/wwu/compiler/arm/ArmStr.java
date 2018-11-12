@@ -25,9 +25,9 @@ public class ArmStr extends ArmInsn {
         StringBuilder sb = new StringBuilder();
         
         if (isPush()) {
-            sb.append("push ")
+            sb.append("str ")
                 .append(srcReg)
-                .append("\n");
+                .append(",[sp, #-4]!\n");
         } else {
             sb.append("str ")
                 .append(srcReg.toString())

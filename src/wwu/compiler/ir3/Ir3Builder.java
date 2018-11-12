@@ -138,7 +138,7 @@ public class Ir3Builder {
     }
 
     public String cgNewLabelName() {
-        return String.valueOf(++labelIdx);
+        return String.valueOf("L" + ++labelIdx);
     }
 
     public String cgNewTemporaryName() {
@@ -193,7 +193,7 @@ public class Ir3Builder {
 
     public ArmProgram getArmProgram() {
         ArmProgram armProgram = new ArmProgram();
-        Provider provider = new Provider();
+        Provider provider = new Provider(armProgram);
 
         for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
             armProgram.addMethods(cb.getArmMds(provider));
@@ -203,14 +203,12 @@ public class Ir3Builder {
     }
 
     class Provider implements ClassTypeProvider {
-        Map<String, String> strLiterals;
-        Map<Integer, String> intLiterals;
-
         int nextLabelIdx = 0;
 
-        Provider() {
-            strLiterals = new HashMap<>();
-            intLiterals = new HashMap<>();
+        ArmProgram armProgram;
+
+        Provider(ArmProgram armProgram) {
+            this.armProgram = armProgram;
         }
 
         @Override
@@ -225,20 +223,20 @@ public class Ir3Builder {
 
         @Override
         public String addGlobalLiteral(String value) {
-            String label = strLiterals.getOrDefault(value, null);
+            String label = armProgram.getLabelForLiteral(value);
             if (label == null) {
-                label = "S_LITERAL_" + nextLabelIdx++;
-                strLiterals.put(value, label);
+                label = "L" + nextLabelIdx++;
+                armProgram.addLiteral(label, value);
             }
             return label;
         }
 
         @Override
         public String addGlobalLiteral(int value) {
-            String label = intLiterals.getOrDefault(value, null);
+            String label = armProgram.getLabelForLiteral(value);
             if (label == null) {
-                label = "I_LITERAL_" + nextLabelIdx++;
-                intLiterals.put(value, label);
+                label = "L" + nextLabelIdx++;
+                armProgram.addLiteral(label, value);
             }
             return label;
         }

@@ -1,15 +1,15 @@
 package wwu.compiler.arm;
 
 public enum ArmRegisterType {
-    REG_0("r0"),
-    REG_1("r1"),
-    REG_2("r2"),
-    REG_3("r3"),
-    REG_4("r4"),
-    REG_5("r5"),
-    REG_6("r6"),
-    REG_7("r7"),
-    REG_8("r8"),
+    REG_0("a1"),
+    REG_1("a2"),
+    REG_2("a3"),
+    REG_3("a4"),
+    REG_4("v1"),
+    REG_5("v2"),
+    REG_6("v3"),
+    REG_7("v4"),
+    REG_8("v5"),
     REG_SB("sb"), // r9
     REG_SL("sl"), // r10
     REG_FP("fp"), // r11

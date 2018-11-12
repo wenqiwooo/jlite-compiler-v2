@@ -10,9 +10,10 @@ public class Ir3AssignStmt extends Ir3Stmt {
     Ir3Id assignee;
     Ir3Expr expr;
 
-    String defSymbol;
+    String defSymbol = null;
     Set<String> useSymbols;
 
+    // TODO: 
     public Ir3AssignStmt(Ir3Id assignee, Ir3Expr expr) {
         this.assignee = assignee;
         this.expr = expr;
@@ -22,9 +23,16 @@ public class Ir3AssignStmt extends Ir3Stmt {
         
         Set<String> defSymbols = new HashSet<>();
         this.assignee.addUseSymbols(defSymbols);
-        defSymbol = !defSymbols.isEmpty() 
+        String assigneeSym = !defSymbols.isEmpty() 
                 ? defSymbols.iterator().next()
                 : null;
+
+        // Setting the field of an object does not redefine that object
+        if (this.assignee instanceof Ir3Field) {
+            useSymbols.add(assigneeSym);
+        } else {
+            defSymbol = assigneeSym;
+        }
     }
 
     @Override

@@ -25,7 +25,7 @@ public class ArmLdm extends ArmInsn {
         StringBuilder sb = new StringBuilder();
 
         if (isPop()) {
-            sb.append("pop ");
+            sb.append("ldmfd sp!,");
         } else {
             sb.append("ldm ")
                 .append(srcReg.toString())

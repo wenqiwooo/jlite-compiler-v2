@@ -28,6 +28,11 @@ public abstract class Ir3Stmt extends Ir3Base implements BasicBlockStmt.Context 
         this.basicBlockStmt = basicBlockStmt;
     }
 
+    @Override
+    public boolean hasAdditionalSideEffects() {
+        return false;
+    }
+
     void setPrev(Ir3Stmt prev) {
         this.prev = prev;
     }

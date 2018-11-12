@@ -24,6 +24,10 @@ public class NodeState {
         });
     }
 
+    /**
+     * Returns bool
+     * True if state has changed, false otherwise
+     */
     boolean setOnlyLive(Set<String> liveSymbols) {
         boolean stateChanged = false;
         

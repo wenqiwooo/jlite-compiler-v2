@@ -12,6 +12,9 @@ public class BasicBlock extends Node {
     Map<String, BasicBlock> preds;
     Map<String, BasicBlock> succs;
 
+    // We need to traverse all the nodes in the graph at least once
+    boolean marked = false;
+
     CFGraph graph;
 
     public BasicBlock(String key) {
@@ -36,22 +39,19 @@ public class BasicBlock extends Node {
         Set<String> symbols = this.graph.getSymbols();
 
         inState = new NodeState(symbols);
+        outState = new NodeState(symbols);
         
-        NodeState state = inState;
-        NodeState nextState = new NodeState(symbols);
+        NodeState state;
+        NodeState nextState = inState;
         BasicBlockStmt stmt = firstStmt;
 
         while (stmt != null) {
             stmt.setBasicBlock(this);
+            state = nextState;
+            nextState = stmt.succ == null ? outState : new NodeState(symbols);
             stmt.initState(state, nextState);
-            if (stmt.succ != null) {
-                state = nextState;
-                nextState = new NodeState(symbols);
-            }
             stmt = stmt.succ;
         }
-
-        outState = nextState;
     }
 
     public void addPred(BasicBlock bb) {
@@ -71,6 +71,14 @@ public class BasicBlock extends Node {
         return succs.containsKey(CFGraph.EXIT_KEY);
     }
 
+    void mark() {
+        marked = true;
+    }
+
+    void unmark() {
+        marked = false;
+    }
+
     // Builds register interference graph
     void buildRIG(Map<String, Set<String>> rig) {
         addEdgesForRIG(inState, rig);
@@ -85,7 +93,7 @@ public class BasicBlock extends Node {
         Set<String> liveSet = state.getAllLive();
         for (String x : liveSet) {
             for (String y : liveSet) {
-                if (x != y) {
+                if (!x.equals(y)) {
                     rig.get(x).add(y);
                     rig.get(y).add(x);
                 }

@@ -23,6 +23,11 @@ public class Ir3PrintlnStmt extends Ir3Stmt {
         return "println(" + arg.toString() + ");";
     }
 
+    // @Override
+    // public boolean hasAdditionalSideEffects() {
+    //     return true;
+    // }
+
     public Set<String> getUseSymbols() {
         return useSymbols;
     }

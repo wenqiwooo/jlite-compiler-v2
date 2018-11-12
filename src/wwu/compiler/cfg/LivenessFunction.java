@@ -36,31 +36,38 @@ public class LivenessFunction extends TransferFunction {
     }
 
     @Override
-    boolean backwardUpdate(BasicBlock basicBlock) {
+    boolean backwardUpdate(BasicBlock basicBlock, CFGraph cfg) {
         if (!basicBlock.exits()) {
             Set<String> liveSet = new HashSet<>();
             basicBlock.succs.forEach((name, succ) -> {
                 liveSet.addAll(succ.getLiveIn());
             });
             
-            if (!basicBlock.outState.setOnlyLive(liveSet)) {
+            if (!basicBlock.outState.setOnlyLive(liveSet) && basicBlock.marked) {
                 return false;
             }
         }
 
         BasicBlockStmt stmt = basicBlock.lastStmt;
 
+        boolean stateChanged = false;
+
         while (stmt != null) {
             Set<String> liveSet = stmt.outState.getAllLive();
             liveSet.remove(stmt.context.getDef());
-            liveSet.addAll(stmt.context.getUse());
+            if (stmt.context.hasAdditionalSideEffects()) {
+                liveSet.addAll(cfg.getSymbols());
+            } else {
+                liveSet.addAll(stmt.context.getUse());
+            }
             
-            if (!stmt.inState.setOnlyLive(liveSet)) {
+            stateChanged = stmt.inState.setOnlyLive(liveSet);
+            if (!stateChanged && basicBlock.marked) {
                 return false;
             }
             stmt = stmt.pred;
         }
 
-        return true;
+        return stateChanged;
     }
 }

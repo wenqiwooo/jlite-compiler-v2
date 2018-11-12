@@ -13,7 +13,7 @@ public abstract class TransferFunction {
      * @param bb BasicBlock
      * @return true to continue analysis upstream, false otherwise
      */
-    boolean backwardUpdate(BasicBlock bb) {
+    boolean backwardUpdate(BasicBlock bb, CFGraph cfg) {
         return false;
     }
 
@@ -21,7 +21,7 @@ public abstract class TransferFunction {
      * @param bb BasicBlock
      * @return true to continue analysis downstream, false otherwise
      */
-    boolean forwardUpdate(BasicBlock bb) {
+    boolean forwardUpdate(BasicBlock bb, CFGraph cfg) {
         return false;
     }
 }

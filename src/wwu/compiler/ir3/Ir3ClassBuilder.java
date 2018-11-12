@@ -232,12 +232,12 @@ public class Ir3ClassBuilder {
     }
 
     private String generateMethodEncodedName() {
-        return String.format("%%%s_%s", className, nextMethodEncodeId++);
+        return String.format("Func_%s_%s", className, nextMethodEncodeId++);
     }
 
     private static String getMethodKey(String methodName, List<String> paramTypes) {
         StringBuilder sb = new StringBuilder();
-        sb.append("func_").append(methodName);
+        sb.append("Func_").append(methodName);
         if (paramTypes.isEmpty()) {
             sb.append("_").append(Type.VOID);
         } else {

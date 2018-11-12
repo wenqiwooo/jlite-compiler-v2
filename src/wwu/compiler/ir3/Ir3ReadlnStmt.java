@@ -30,6 +30,11 @@ public class Ir3ReadlnStmt extends Ir3Stmt {
         return defSymbol;
     }
 
+    // @Override
+    // public boolean hasAdditionalSideEffects() {
+    //     return true;
+    // }
+
     @Override
     void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
             throws CodeGenerationException {

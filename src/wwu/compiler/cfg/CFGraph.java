@@ -20,6 +20,9 @@ public class CFGraph {
         entry = new BasicBlock(ENTRY_KEY);
         exit = new BasicBlock(EXIT_KEY);
         basicBlocks = new HashMap<>();
+
+        entry.initState(this);
+        exit.initState(this);
     }
 
     public void addBasicBlock(BasicBlock bb) {
@@ -39,6 +42,10 @@ public class CFGraph {
         succ.addPred(pred);
     }
 
+    public Set<String> getLiveIn() {
+        return entry.getLiveOut();
+    }
+
     Set<String> getSymbols() {
         return symbols;
     }
@@ -49,6 +56,7 @@ public class CFGraph {
     public void backwardAnalysis(TransferFunction f) {
         f.initEntryState(entry);
         f.initExitState(exit);
+
         for (BasicBlock bb : basicBlocks.values()) {
             f.initBasicBlockState(bb);
         }
@@ -60,15 +68,24 @@ public class CFGraph {
         
         while (!stack.isEmpty()) {
             BasicBlock bb = stack.remove(stack.size() - 1);
-            boolean shouldContinue = f.backwardUpdate(bb);
-            if (shouldContinue) {
-                for (BasicBlock nextBb : bb.preds.values()) {
-                    if (nextBb != entry) {
-                        stack.add(nextBb);
-                    }
+            boolean shouldContinue = f.backwardUpdate(bb, this);
+            // Mark only after update is done
+            bb.mark();
+            for (BasicBlock nextBb : bb.preds.values()) {
+                if (shouldContinue || !nextBb.marked) {
+                    stack.add(nextBb);
                 }
             }
         }
+
+        // After analysis, unmark all basic blocks
+        for (BasicBlock bb : basicBlocks.values()) {
+            bb.unmark();
+        }
+
+        // TODO: After analysis, check live state of entry block. 
+        // Mark those parameters that are not live
+        
     }
 
     /**
@@ -107,7 +124,7 @@ public class CFGraph {
         return new Pair<>(assignment, spills);
     }
 
-    private Map<String, Set<String>> getRIG() {
+    private Map<String, Set<String>> getRIG() {    
         Map<String, Set<String>> rig = new HashMap<>();
         for (String sym : symbols) {
             rig.put(sym, new HashSet<>());
@@ -115,6 +132,17 @@ public class CFGraph {
         basicBlocks.forEach((key, basicBlock) -> {
             basicBlock.buildRIG(rig);
         });
+
+        Set<String> liveParams = entry.getLiveOut();
+        for (String x : liveParams) {
+            for (String y : liveParams) {
+                if (!x.equals(y)) {
+                    rig.get(x).add(y);
+                    rig.get(y).add(x);
+                }
+            }
+        }
+
         return rig;
     }
 }

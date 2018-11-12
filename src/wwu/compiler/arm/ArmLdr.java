@@ -25,9 +25,9 @@ public class ArmLdr extends ArmInsn {
         StringBuilder sb = new StringBuilder();
 
         if (isPop()) {
-            sb.append("pop ")
+            sb.append("ldr ")
                 .append(destReg.toString())
-                .append("\n");
+                .append(",[sp],#4\n");
         } else {
             sb.append("ldr ")
                 .append(destReg.toString())

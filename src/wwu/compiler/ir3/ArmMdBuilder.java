@@ -15,6 +15,8 @@ public class ArmMdBuilder {
     Map<ArmRegisterType, ArmReg> registerMap;
     // Variables that are spilled
     Set<String> spills;
+    // Params whose values are live
+    Set<String> liveParams;
 
     ArmInsn firstInsn;
     ArmInsn lastInsn;
@@ -30,7 +32,8 @@ public class ArmMdBuilder {
             Map<String, String> params, 
             Map<String, String> localDecls, 
             Map<String, Integer> assignment, 
-            Set<String> spills) {
+            Set<String> spills, 
+            Set<String> liveParams) {
         this.className = className;
         this.methodName = methodName;
 
@@ -46,6 +49,8 @@ public class ArmMdBuilder {
         }
 
         this.spills = spills;
+        this.liveParams = liveParams;
+
         varToLocationMap = new HashMap<>();
         registerMap = new HashMap<>();
 
@@ -205,8 +210,21 @@ public class ArmMdBuilder {
             cnt++;
         }
 
-        // Assign registers to parameters and move them if neccessary
+        // Reorder our params so that assignment is done for live params first
+        Map<String, String> orderedParams = new LinkedHashMap<>();
         for (Map.Entry<String, String> paramEntry : paramToTypeMap.entrySet()) {
+            if (liveParams.contains(paramEntry.getKey())) {
+                orderedParams.put(paramEntry.getKey(), paramEntry.getValue());
+            }
+        }
+        for (Map.Entry<String, String> paramEntry : paramToTypeMap.entrySet()) {
+            if (!orderedParams.containsKey(paramEntry.getKey())) {
+                orderedParams.put(paramEntry.getKey(), paramEntry.getValue());
+            }
+        }
+
+        // Assign registers to parameters and move them if neccessary
+        for (Map.Entry<String, String> paramEntry : orderedParams.entrySet()) {
             String paramName = paramEntry.getKey();
             String paramType = paramEntry.getValue();
             VarLocation loc = varToLocationMap.get(paramName);
@@ -229,11 +247,14 @@ public class ArmMdBuilder {
                     // Assign param to the register it was passed in if possible,
                     // otherwise move it to the assigned register
                     if (reg == null) {
-                        reg = getNextAvailableReg(idxToRegisterMap);
+                        reg = getNextAvailableReg(idxToRegisterMap, loc.getReg());
                         idxToRegisterMap.put(assignIdx, reg);
                     }
                     if (reg != loc.getReg()) {
-                        addInsn(new ArmMov(reg, loc.getReg()));
+                        // If param value is dead to begin with, there is no need to move its value
+                        if (liveParams.contains(paramName)) {
+                            addInsn(new ArmMov(reg, loc.getReg()));
+                        }
                         loc.updateLocation(reg);
                     }
                 }
@@ -241,10 +262,12 @@ public class ArmMdBuilder {
                     // Param is passed via stack,
                     // assign it to a register since it is non-spill
                     if (reg == null) {
-                        reg = getNextAvailableReg(idxToRegisterMap);
+                        reg = getNextAvailableReg(idxToRegisterMap, null);
                         idxToRegisterMap.put(assignIdx, reg);
                     }
-                    addInsn(new ArmLdr(reg, loc.getMem()));
+                    if (liveParams.contains(paramName)) {
+                        addInsn(new ArmLdr(reg, loc.getMem()));
+                    }
                     loc.updateLocation(reg);
                 }
             }
@@ -267,7 +290,7 @@ public class ArmMdBuilder {
                 ArmReg reg = idxToRegisterMap.getOrDefault(assignIdx, null);
                 
                 if (reg == null) {
-                    reg = getNextAvailableReg(idxToRegisterMap);
+                    reg = getNextAvailableReg(idxToRegisterMap, null);
                     idxToRegisterMap.put(assignIdx, reg);
                 }
                 loc = new VarLocation(localName, reg);
@@ -277,7 +300,14 @@ public class ArmMdBuilder {
         }
     }
 
-    private ArmReg getNextAvailableReg(Map<Integer, ArmReg> idxToRegisterMap) {
+    /**
+     * Returns preferredReg if it is available or the next available register
+     */
+    private ArmReg getNextAvailableReg(Map<Integer, ArmReg> idxToRegisterMap, 
+            ArmReg preferredReg) {
+        if (preferredReg != null && !idxToRegisterMap.containsValue(preferredReg)) {
+            return preferredReg;
+        }
         for (int i = 0; i < ArmRegisterType.MAX_ASSIGNABLE; i++) {
             ArmReg reg = getReg(ArmRegisterType.getByIdx(i));
             if (!idxToRegisterMap.containsValue(reg)) {
