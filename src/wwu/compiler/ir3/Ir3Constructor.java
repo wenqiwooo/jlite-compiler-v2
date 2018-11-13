@@ -5,7 +5,7 @@ import java.util.*;
 import wwu.compiler.arm.*;
 
 public class Ir3Constructor extends Ir3Expr {
-    private static final String NEW_FUNC = "_Znwj";
+    private static final String NEW_FUNC = "malloc";
 
     String type;
 
