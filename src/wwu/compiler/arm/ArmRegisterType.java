@@ -1,22 +1,22 @@
 package wwu.compiler.arm;
 
 public enum ArmRegisterType {
-    REG_0("a1"),
-    REG_1("a2"),
-    REG_2("a3"),
-    REG_3("a4"),
-    REG_4("v1"),
-    REG_5("v2"),
-    REG_6("v3"),
-    REG_7("v4"),
-    REG_8("v5"),
-    REG_SB("sb"), // r9
-    REG_SL("sl"), // r10
-    REG_FP("fp"), // r11
-    REG_IP("ip"), // r12
-    REG_SP("sp"), // r13
-    REG_LR("lr"), // r14
-    REG_PC("pc"); // r15
+    REG_0("a1", 0),
+    REG_1("a2", 1),
+    REG_2("a3", 2),
+    REG_3("a4", 3),
+    REG_4("v1", 4),
+    REG_5("v2", 5),
+    REG_6("v3", 6),
+    REG_7("v4", 7),
+    REG_8("v5", 8),
+    REG_SB("sb", 9), // r9
+    REG_SL("sl", 10), // r10
+    REG_FP("fp", 11), // r11
+    REG_IP("ip", 12), // r12
+    REG_SP("sp", 13), // r13
+    REG_LR("lr", 14), // r14
+    REG_PC("pc", 15); // r15
 
     // Max number of param registers
     public static final int MAX_PARAM_REGS = 4;
@@ -24,14 +24,20 @@ public enum ArmRegisterType {
     public static final int MAX_ASSIGNABLE = 8;
 
     private String value;
+    private int idx;
 
-    private ArmRegisterType(String value) {
+    private ArmRegisterType(String value, int idx) {
         this.value = value;
+        this.idx = idx;
     }
 
     @Override
     public String toString() {
         return value;
+    }
+
+    public int getIdx() {
+        return idx;
     }
 
     public static ArmRegisterType getByIdx(int idx) {

@@ -37,6 +37,6 @@ public abstract class Ir3BasicId extends Ir3Id {
 
     abstract ArmOperand tryGetArmOperand(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider);
-    
+
     abstract String getType();
 }
