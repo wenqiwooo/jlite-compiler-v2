@@ -71,9 +71,23 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
                     mdBuilder, classTypeProvider);
         
         // Rd and Rm should be different in mul (for ARM target)
-        if (armOperand == armReg) {
-            mdBuilder.addInsn(new ArmMov(mdBuilder.getTempReg2(), armOperand));
-            armOperand = mdBuilder.getTempReg2();
+        if (armOp == ArmArithOp.Operator.MUL) {
+            if (destReg == armReg) {
+                ArmReg tempReg;
+                if (armReg != armOperand) {
+                    tempReg = (ArmReg)armOperand;
+                    armOperand = armReg;
+                    armReg = tempReg;
+                } else {
+                    if (destReg != mdBuilder.getTempReg1()) {
+                        tempReg = mdBuilder.getTempReg1();
+                    } else {
+                        tempReg = mdBuilder.getTempReg2();
+                    }
+                    mdBuilder.addInsn(new ArmMov(tempReg, armReg));
+                    armReg = tempReg;
+                }
+            }
         }
 
         mdBuilder.addInsn(new ArmArithOp(armOp, destReg, armReg, armOperand));
