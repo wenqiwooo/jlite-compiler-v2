@@ -40,8 +40,11 @@ public class ArmBranch extends ArmInsn {
             sb.append(cond.toString());
         }
         sb.append(" ")
-            .append(target)
-            .append("\n");
+            .append(target);
+        if (mode == Mode.BL) {
+            sb.append("(PLT)");
+        }
+        sb.append("\n");
         return sb.toString();
     }
 }

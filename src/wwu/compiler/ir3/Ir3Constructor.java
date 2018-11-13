@@ -5,7 +5,7 @@ import java.util.*;
 import wwu.compiler.arm.*;
 
 public class Ir3Constructor extends Ir3Expr {
-    private static final String ALLOC_BL_TARGET = "_Znwj(PLT)";
+    private static final String NEW_FUNC = "_Znwj";
 
     String type;
 
@@ -28,7 +28,7 @@ public class Ir3Constructor extends Ir3Expr {
         ArmReg r0 = mdBuilder.getReg(ArmRegisterType.REG_0);
         ArmOperand allocSize = new ArmImmediate(classTypeProvider.getClassSize(type));
         mdBuilder.addInsn(new ArmMov(r0, allocSize));
-        mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.BL, ALLOC_BL_TARGET));
+        mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.BL, NEW_FUNC));
         mdBuilder.addInsn(new ArmMov(destReg, r0));
         
         mdBuilder.addInsn(ArmLdm.pop(regs));

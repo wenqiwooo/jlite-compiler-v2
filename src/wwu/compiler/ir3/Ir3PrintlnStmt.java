@@ -8,8 +8,8 @@ import wwu.compiler.exception.*;
 
 public class Ir3PrintlnStmt extends Ir3Stmt {
     Ir3BasicId arg;
-
     Set<String> useSymbols;
+    private static final String PRINTF_FUNC = "printf";
     
     public Ir3PrintlnStmt(Ir3BasicId arg) {
         this.arg = arg;
@@ -60,7 +60,7 @@ public class Ir3PrintlnStmt extends Ir3Stmt {
             mdBuilder.addInsn(new ArmLdr(r0, ldrOperand));
         }
 
-        mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.BL, "printf(PLT)"))
+        mdBuilder.addInsn(new ArmBranch(ArmBranch.Mode.BL, PRINTF_FUNC))
                 .addInsn(ArmLdm.pop(scratchRegs));
     }
 }
