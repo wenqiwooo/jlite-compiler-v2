@@ -250,13 +250,14 @@ public class Ir3MdBuilder {
         Pair<Map<String, Integer>, Set<String>> res = 
                 cfGraph.allocRegisters(ArmRegisterType.MAX_ASSIGNABLE);
         Map<String, Integer> assignment = res.first();
-        System.out.println("Method: " + methodName);
-        System.out.println("Assignments: " + assignment);
         Set<String> spills = res.second();
-        System.out.println("Spills: " + spills);
-        System.out.println("Code: ");
-        System.out.println(toCode());
-        System.out.println("\n");
+
+        // System.out.println("Method: " + methodName);
+        // System.out.println("Assignments: " + assignment);
+        // System.out.println("Spills: " + spills);
+        // System.out.println("Code: ");
+        // System.out.println(toCode());
+        // System.out.println("\n");
         
         /**
          * For spill variables, we need to have stack memory allocated for them 

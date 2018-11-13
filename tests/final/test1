@@ -43,10 +43,6 @@ class Compute {
             return add(square(a),square(b));
         } 
     }
-
-    Int test(Int a, Int b, Int c, Int d, Int e) {
-        return b + d;
-    }
 }
 
 /*
