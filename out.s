@@ -18,7 +18,7 @@ mov a3,#3
 mov a4,#4
 stmfd sp!,{a1,a2,a3,a4,ip}
 mov a1,#8
-bl _Znwj(PLT)
+bl malloc(PLT)
 mov v1,a1
 ldmfd sp!,{a1,a2,a3,a4,ip}
 stmfd sp!,{a2,a3,a4,ip}
