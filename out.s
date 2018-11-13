@@ -69,7 +69,8 @@ stmfd sp!,{fp,lr}
 stmfd sp!,{v1,v2,v3,v4,v5}
 mov fp,sp
 sub sp,sp,#0
-mul a2,a2,a2
+mov ip,a2
+mul a2,a2,ip
 mov a1,a2
 b Func_Compute_0_exit
 
