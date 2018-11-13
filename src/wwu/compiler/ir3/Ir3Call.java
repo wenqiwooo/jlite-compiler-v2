@@ -102,6 +102,25 @@ public class Ir3Call extends Ir3Expr {
         Map<ArmReg, ArmReg> destToTempMap = new HashMap<>();
         ArmInsnChain insnChain = new ArmInsnChain();
 
+        // Resolve inner-dependencies and cycles first
+        for (Map.Entry<ArmReg, ArmReg> entry : destToSrcMap.entrySet()) {
+            ArmReg destReg = entry.getKey();
+            ArmReg srcReg = entry.getValue();
+            if (!destToSrcMap.containsKey(srcReg)) {
+                // This has to be the end of some chain, so we skip for now.
+                continue;
+            }
+            if (!visited.contains(destReg)) {
+                visited.add(destReg);
+                insnChain.concat(
+                    mapArgToReg(destReg, 
+                        destToSrcMap, 
+                        visited, 
+                        destToTempMap, 
+                        mdBuilder));
+            }
+        }
+
         for (Map.Entry<ArmReg, ArmReg> entry : destToSrcMap.entrySet()) {
             ArmReg destReg = entry.getKey();
             if (!visited.contains(destReg)) {

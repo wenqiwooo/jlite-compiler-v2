@@ -35,4 +35,13 @@ public class Ir3Field extends Ir3Id {
         
         mdBuilder.addInsn(new ArmLdr(destReg, srcMem));
     }
+
+    ArmReg getFieldInReg(ArmReg destReg, ArmReg backupReg, ArmMdBuilder mdBuilder, 
+            ClassTypeProvider classTypeProvider) {
+        ArmReg parentReg = parent.getArmReg(backupReg, mdBuilder, classTypeProvider);
+        int offset = classTypeProvider.getClassFieldOffset(parent.type, fieldName);
+        ArmMem srcMem = new ArmMem(parentReg, new ArmImmediate(offset));
+        mdBuilder.addInsn(new ArmLdr(destReg, srcMem));
+        return destReg;
+    }
 }

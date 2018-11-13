@@ -32,18 +32,33 @@ public class Ir3IfGotoStmt extends Ir3Stmt {
     @Override
     void buildArm(ArmMdBuilder mdBuilder, ClassTypeProvider classTypeProvider) 
             throws CodeGenerationException {
-        if (pred instanceof Ir3BasicId) {
-            ArmReg armReg = ((Ir3BasicId)pred).getArmReg(mdBuilder.getTempReg1(), 
-                    mdBuilder, classTypeProvider);
-
-            mdBuilder.addInsn(new ArmMov(mdBuilder.getTempReg2(), 
-                            new ArmImmediate(0)))
-                    .addInsn(new ArmCompare(armReg, mdBuilder.getTempReg2()))
-                    .addInsn(new ArmBranch(ArmBranch.Mode.B, ArmCondition.NE, label));
-        }  
-        else if (pred instanceof Ir3BinaryExpr) {
+        if (pred instanceof Ir3BinaryExpr) {
             ((Ir3BinaryExpr)pred).buildArmForIfGotoStmt(label, 
                     mdBuilder, classTypeProvider);
+        } 
+        else {
+            ArmReg armReg = null;
+            if (pred instanceof Ir3BasicId) {
+                armReg = ((Ir3BasicId)pred).getArmReg(mdBuilder.getTempReg1(), 
+                        mdBuilder, classTypeProvider);
+            }
+            else if (pred instanceof Ir3Field) {
+                // TODO: By right there should not be a field here.
+                armReg = ((Ir3Field)pred).getFieldInReg(
+                        mdBuilder.getTempReg1(), 
+                        mdBuilder.getTempReg2(), 
+                        mdBuilder, 
+                        classTypeProvider);
+            }
+
+            if (armReg == null) {
+                throw new CodeGenerationException("armReg is null for Ir3IfGotoStmt");
+            }
+
+            mdBuilder.addInsn(new ArmMov(mdBuilder.getTempReg2(), 
+                                new ArmImmediate(0)))
+                    .addInsn(new ArmCompare(armReg, mdBuilder.getTempReg2()))
+                    .addInsn(new ArmBranch(ArmBranch.Mode.B, ArmCondition.NE, label));
         }
     }
 }

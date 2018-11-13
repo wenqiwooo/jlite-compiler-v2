@@ -225,7 +225,7 @@ public class Ir3Builder {
         public String addGlobalLiteral(String value) {
             String label = armProgram.getLabelForLiteral(value);
             if (label == null) {
-                label = "L" + nextLabelIdx++;
+                label = "D" + nextLabelIdx++;
                 armProgram.addLiteral(label, value);
             }
             return label;
@@ -235,7 +235,7 @@ public class Ir3Builder {
         public String addGlobalLiteral(int value) {
             String label = armProgram.getLabelForLiteral(value);
             if (label == null) {
-                label = "L" + nextLabelIdx++;
+                label = "D" + nextLabelIdx++;
                 armProgram.addLiteral(label, value);
             }
             return label;
