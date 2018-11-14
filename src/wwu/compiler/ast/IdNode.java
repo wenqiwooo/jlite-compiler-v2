@@ -21,14 +21,14 @@ public class IdNode extends AtomNode {
         String type = env.getTypeForVar(name);
 
         if (env.isVarClassField(name)) {
-            Ir3Identifier parent = new Ir3Identifier("this");
+            Ir3Identifier parent = new Ir3Identifier("this", env.getCurrentClassType());
             Ir3Expr expr = new Ir3Field(parent, name);
             
             if (shouldReduce) {
                 String tmpVarName = env.cgNewTemporaryName();
                 env.cgLocalDecl(tmpVarName, type);
 
-                Ir3Id tmpVar = new Ir3Identifier(tmpVarName);
+                Ir3Id tmpVar = new Ir3Identifier(tmpVarName, type);
                 env.cgCode(new Ir3AssignStmt(tmpVar, expr));
 
                 return new TypeCheckResult(type, tmpVar, true);
@@ -36,7 +36,7 @@ public class IdNode extends AtomNode {
                 return new TypeCheckResult(type, expr, false);
             }
         } else {
-            Ir3Id expr = new Ir3Identifier(name);
+            Ir3Id expr = new Ir3Identifier(name, type);
             return new TypeCheckResult(type, expr, true);
         }
     }

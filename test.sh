@@ -25,18 +25,19 @@ class_path=$1
 
 # Semantic tests
 
-while [ $idx -le $semantic_tests_count ]
-do
-    java -cp $class_path wwu.compiler.Jlc tests/semantic/test$idx > output.txt
-    res=$(diff --ignore-blank-lines --ignore-space-change output.txt tests/semantic/test"$idx"_output)
-    if [ "$res" == "" ]
-    then
-        echo "Test $idx passed."
-    else
-        echo "Test $idx failed."
-    fi
-    ((idx++))
-done
+# while [ $idx -le $semantic_tests_count ]
+# do
+#     java -cp $class_path wwu.compiler.Jlc tests/semantic/test$idx > output.txt
+#     res=$(diff --ignore-blank-lines --ignore-space-change output.txt tests/semantic/test"$idx"_output)
+#     if [ "$res" == "" ]
+#     then
+#         echo "Test $idx passed."
+#     else
+#         echo "Test $idx failed."
+#     fi
+#     ((idx++))
+# done
 
-rm output.txt
+# rm output.txt
 
+java -cp $class_path wwu.compiler.Jlc tests/final/test1 > out.s

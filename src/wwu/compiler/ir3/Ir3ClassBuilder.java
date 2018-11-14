@@ -1,32 +1,32 @@
 package wwu.compiler.ir3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import wwu.compiler.arm.*;
 import wwu.compiler.common.*;
 import wwu.compiler.exception.*;
-import wwu.compiler.ir3.Ir3MdBuilder;
 import wwu.compiler.util.Pair;
 
 public class Ir3ClassBuilder {
-    public Map<String, String> classFieldsToTypeMap;
+    public Map<String, String> classFieldToTypeMap;
     // Mapping of method name to map of overloaded methods
     public Map<String, Map<String, Ir3MdBuilder>> methodToBuildersMap;
 
     private Map<String, String> methodToReturnTypeMap;
     private String className;
+    // Byte offset of class fields
+    private Map<String, Integer> classFieldToOffsetMap;
     // Size of class object in bytes
     private int sizeBytes = 0;
     private int nextMethodEncodeId = 0;
 
     public Ir3ClassBuilder(ClassBundle classBundle) throws TypeCheckException {
-        classFieldsToTypeMap = new LinkedHashMap<>();
+        classFieldToTypeMap = new LinkedHashMap<>();
         methodToBuildersMap = new LinkedHashMap<>();
         methodToReturnTypeMap = new HashMap<>();
         className = classBundle.className;
+
+        classFieldToOffsetMap = new LinkedHashMap<>();
 
         for (Pair<String, String> field : classBundle.classFields) {
             addField(field);
@@ -46,7 +46,7 @@ public class Ir3ClassBuilder {
     }
 
     public String getTypeForField(String fieldName) throws TypeCheckException {
-        String fieldType = classFieldsToTypeMap.getOrDefault(fieldName, null);
+        String fieldType = classFieldToTypeMap.getOrDefault(fieldName, null);
         if (fieldType == null) {
             throw new ClassFieldNotFoundException(className, fieldName);
         }
@@ -129,13 +129,28 @@ public class Ir3ClassBuilder {
         return mdBuilder.getMethodEncodedName();
     }
 
+    public int getOffsetForField(String fieldName) {
+        return classFieldToOffsetMap.get(fieldName);
+    }
+
+    List<ArmMd> getArmMds(ClassTypeProvider classTypeProvider) {
+        List<ArmMd> res = new ArrayList<>();
+        for (Map<String, Ir3MdBuilder> mbs : methodToBuildersMap.values()) {
+            for (Ir3MdBuilder mb : mbs.values()) {
+                res.add(mb.getArmMd(classTypeProvider));
+            }
+        }
+        return res;
+    }
+
     private void addField(Pair<String, String> field) throws TypeCheckException {
         // No two fields in a class can have the same name.
-        if (classFieldsToTypeMap.containsKey(field.first())) {
+        if (classFieldToTypeMap.containsKey(field.first())) {
             throw new ClassFieldRedeclaredException(className, field.first());
         }
-        classFieldsToTypeMap.put(field.first(), field.second());
-        sizeBytes += TypeHelper.getVarSizeForType(field.second());
+        classFieldToTypeMap.put(field.first(), field.second());
+        classFieldToOffsetMap.put(field.first(), sizeBytes);
+        sizeBytes += TypeHelper.getArmModeForType(field.second()).getSize();
     }
 
     /**
@@ -217,12 +232,12 @@ public class Ir3ClassBuilder {
     }
 
     private String generateMethodEncodedName() {
-        return String.format("%%%s_%s", className, nextMethodEncodeId++);
+        return String.format("Func_%s_%s", className, nextMethodEncodeId++);
     }
 
     private static String getMethodKey(String methodName, List<String> paramTypes) {
         StringBuilder sb = new StringBuilder();
-        sb.append("func_").append(methodName);
+        sb.append("Func_").append(methodName);
         if (paramTypes.isEmpty()) {
             sb.append("_").append(Type.VOID);
         } else {

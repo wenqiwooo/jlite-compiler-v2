@@ -3,6 +3,7 @@ package wwu.compiler.ir3;
 import java.util.*;
 
 import wwu.compiler.util.Pair;
+import wwu.compiler.arm.ArmProgram;
 import wwu.compiler.common.TypeHelper;
 import wwu.compiler.exception.*;
 import wwu.compiler.exception.ClassNotFoundException;
@@ -137,7 +138,7 @@ public class Ir3Builder {
     }
 
     public String cgNewLabelName() {
-        return String.valueOf(++labelIdx);
+        return String.valueOf("L" + ++labelIdx);
     }
 
     public String cgNewTemporaryName() {
@@ -165,7 +166,7 @@ public class Ir3Builder {
             sb.append("class ")
                 .append(cb.getClassName())
                 .append("{\n");
-            for (Map.Entry<String, String> entry : cb.classFieldsToTypeMap.entrySet()) {
+            for (Map.Entry<String, String> entry : cb.classFieldToTypeMap.entrySet()) {
                 sb.append("    ")
                     .append(entry.getValue())
                     .append(" ")
@@ -190,6 +191,57 @@ public class Ir3Builder {
         return sb.toString();
     }
 
+    public ArmProgram getArmProgram() {
+        ArmProgram armProgram = new ArmProgram();
+        Provider provider = new Provider(armProgram);
+
+        for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
+            armProgram.addMethods(cb.getArmMds(provider));
+        }
+
+        return armProgram;
+    }
+
+    class Provider implements ClassTypeProvider {
+        int nextLabelIdx = 0;
+
+        ArmProgram armProgram;
+
+        Provider(ArmProgram armProgram) {
+            this.armProgram = armProgram;
+        }
+
+        @Override
+        public int getClassFieldOffset(String className, String fieldName) {
+            return classToBuildersMap.get(className).getOffsetForField(fieldName);
+        }
+
+        @Override
+        public int getClassSize(String className) {
+            return classToBuildersMap.get(className).getSizeBytes();
+        }
+
+        @Override
+        public String addGlobalLiteral(String value) {
+            String label = armProgram.getLabelForLiteral(value);
+            if (label == null) {
+                label = "D" + nextLabelIdx++;
+                armProgram.addLiteral(label, value);
+            }
+            return label;
+        }
+
+        @Override
+        public String addGlobalLiteral(int value) {
+            String label = armProgram.getLabelForLiteral(value);
+            if (label == null) {
+                label = "D" + nextLabelIdx++;
+                armProgram.addLiteral(label, value);
+            }
+            return label;
+        }
+    }
+
     private void addClass(ClassBundle classBundle) throws TypeCheckException {
         // No two classes can be declared in a program with the same name.
         if (classToBuildersMap.containsKey(classBundle.className)) {
@@ -202,7 +254,7 @@ public class Ir3Builder {
 
     private void validate() throws TypeCheckException {
         for (Ir3ClassBuilder cb : classToBuildersMap.values()) {
-            for (Map.Entry<String, String> entry : cb.classFieldsToTypeMap.entrySet()) {
+            for (Map.Entry<String, String> entry : cb.classFieldToTypeMap.entrySet()) {
                 if (!isValidDeclType(entry.getValue())) {
                     throw new ClassFieldInvalidTypeException(cb.getClassName(), 
                             entry.getKey(), entry.getValue());

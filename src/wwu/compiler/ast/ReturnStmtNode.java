@@ -31,7 +31,7 @@ public class ReturnStmtNode extends StmtNode {
         if (expr != null) {
             TypeCheckResult resExpr = TypeCheckHelper.checkType(env, expr, true);
             
-            Ir3Id arg = null;
+            Ir3Identifier arg = null;
             if (!(resExpr.ir3Obj instanceof Ir3Identifier)) {
                 String tmpVarName = env.cgNewTemporaryName();
                 
@@ -51,14 +51,15 @@ public class ReturnStmtNode extends StmtNode {
                             env.getCurrentMethodReturnType());
                     throw new TypeCheckException(errMsg);
                 }
-                env.cgLocalDecl(tmpVarName, env.getCurrentMethodReturnType());
+                String returnType = env.getCurrentMethodReturnType();
+                env.cgLocalDecl(tmpVarName, returnType);
 
-                Ir3Identifier tmpVar = new Ir3Identifier(tmpVarName);
+                Ir3Identifier tmpVar = new Ir3Identifier(tmpVarName, returnType);
                 env.cgCode(new Ir3AssignStmt(tmpVar, resExpr.ir3Obj));
 
                 arg = tmpVar;
             } else {
-                arg = (Ir3Id)resExpr.ir3Obj;
+                arg = (Ir3Identifier)resExpr.ir3Obj;
             }
 
             env.cgCode(new Ir3ReturnStmt(arg));

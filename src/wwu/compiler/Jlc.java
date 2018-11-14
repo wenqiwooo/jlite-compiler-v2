@@ -4,6 +4,7 @@ import java.io.*;
 
 import wwu.compiler.ast.*;
 import wwu.compiler.ir3.*;
+import wwu.compiler.arm.*;
 import wwu.compiler.exception.*;
 
 // JLite compiler
@@ -18,7 +19,12 @@ class Jlc {
             
             Ir3Builder ir3 = new Ir3Builder(ast.toClassBundles());
             TypeCheckHelper.checkType(ir3, ast);
-            System.out.println(ir3.toCode());
+
+            ArmProgram armProgram = ir3.getArmProgram();
+
+            // System.out.println(ir3.toCode());
+
+            System.out.println(armProgram.toString());
         } 
         catch (Exception e) {
             e.printStackTrace();

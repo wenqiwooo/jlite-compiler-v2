@@ -34,7 +34,7 @@ public class PrintStmtNode extends StmtNode {
             throw new TypeCheckException(errMsg);
         }
 
-        env.cgCode(new Ir3PrintlnStmt((Ir3Id)resExpr.ir3Obj));
+        env.cgCode(new Ir3PrintlnStmt((Ir3BasicId)resExpr.ir3Obj));
 
         return new TypeCheckResult(Type.VOID);
     }

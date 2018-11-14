@@ -1,5 +1,6 @@
 package wwu.compiler.ast;
 
+import wwu.compiler.arm.ArmOperand;
 import wwu.compiler.common.*;
 import wwu.compiler.ir3.*;
 import wwu.compiler.exception.*;
@@ -39,13 +40,13 @@ public class UnaryExprNode extends ExprNode {
             throw new TypeCheckException(errMsg);
         }
 
-        Ir3Expr expr = new Ir3UnaryExpr(op, (Ir3Id)resX.ir3Obj);
+        Ir3Expr expr = new Ir3UnaryExpr(op, (Ir3BasicId)resX.ir3Obj);
 
         if (shouldReduce) {
             String tmpVarName = env.cgNewTemporaryName();
             env.cgLocalDecl(tmpVarName, type);
 
-            Ir3Id tmpVar = new Ir3Identifier(tmpVarName);
+            Ir3Id tmpVar = new Ir3Identifier(tmpVarName, type);
             env.cgCode(new Ir3AssignStmt(tmpVar, expr));
 
             return new TypeCheckResult(type, tmpVar, true);
