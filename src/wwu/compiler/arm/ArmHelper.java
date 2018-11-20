@@ -20,4 +20,9 @@ public class ArmHelper {
         int x = (int)input;
         return isValidDataImmediate(x);
     }
+
+    public static boolean isValidOffsetImmediate(int offset) {
+        // Offset range is -4095 to 4095
+        return offset > -4096 && offset < 4096;
+    }
 }
