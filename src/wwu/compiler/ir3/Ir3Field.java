@@ -36,7 +36,7 @@ public class Ir3Field extends Ir3Id {
         return destReg;
     }
 
-    private loadToReg(ArmReg destReg, ArmMdBuilder mdBuilder, 
+    private void loadToReg(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
         ArmReg armReg = parent.getArmReg(mdBuilder.getTempReg1(), 
                 mdBuilder, classTypeProvider);
