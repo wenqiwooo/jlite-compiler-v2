@@ -3,12 +3,20 @@ class MainClass {
         Math m;
         m = new Math();
 
-        println("Answer of Fib(11) is: ");
+        println("Answer of Fib(11): ");
         println(m.fib(11));
         println("\n");
 
-        println("Answer of 100*100 is: ");
+        println("Answer of 100*100: ");
         println(m.times(100, 100));
+        println("\n");
+
+        println("Loopy answer for x=400, z=True: ");
+        println(m.loopy(400, true));
+        println("\n");
+
+        println("Loopy answer for x=400, z=False: ");
+        println(m.loopy(400, false));
         println("\n");
     }
 }
@@ -44,6 +52,49 @@ class Math {
         }
 
         return sum;
+    }
+
+    Int loopy(Int x, Bool z) {
+        Int limit;
+        Int c;
+
+        limit = 20;
+
+        println("New loopy with x=");
+        println(x);
+        println(" z=");
+        if (z) {
+            println("true");
+        } else {
+            println("false");
+        }
+        println("\n");
+
+        if (z) {
+            if (x < 100) {
+                c = 0;
+                while (x < 200 && c < limit) {
+                    x = x + 1;
+                    c = c + 1;
+                }
+                return loopy(x, z);
+            } 
+            else {
+                if (x == 200) {
+                    return 200;
+                }
+                else {
+                    c = 0;
+                    while (x > 200 && c < limit) {
+                        x = x - 1;
+                        c = c + 1;
+                    }
+                    return loopy(x, z);
+                }
+            }
+        } else {
+            return ---x;
+        }
     }
 }
 

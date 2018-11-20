@@ -113,6 +113,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
         ArmReg armReg1 = operand1.tryGetArmReg(mdBuilder, classTypeProvider);
         ArmReg armReg2 = operand2.tryGetArmReg(mdBuilder, classTypeProvider);
         ArmBoolOp.Operator armOp = armOpForBoolOp(operator);
+        
         if (armReg1 == destReg) {
             if (armReg2 == null) {
                 armReg2 = operand2.getArmReg(mdBuilder.getTempReg1(), 
@@ -141,17 +142,6 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
             }
             mdBuilder.addInsn(new ArmBoolOp(armOp, armReg1, armReg2));
         }
-
-        // ArmReg armReg1 = operand1.getArmReg(destReg, mdBuilder, classTypeProvider);
-        // // if (armReg1 != destReg) {
-        // //     mdBuilder.addInsn(new ArmMov(destReg, armReg1));
-        // //     armReg1 = destReg;
-        // // }
-        // ArmReg armReg2 = operand2.getArmReg(mdBuilder.getTempReg2(), 
-        //         mdBuilder, classTypeProvider);
-                
-        // ArmBoolOp.Operator armOp = armOpForBoolOp(operator);
-        // mdBuilder.addInsn(new ArmBoolOp(armOp, armReg1, armReg2));
     }
 
     private static ArmCondition armCondForRelOp(Op op) {
@@ -194,7 +184,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
     }
 
     private static ArmBoolOp.Operator armOpForBoolOp(Op op) {
-        if (op == Op.ADD) {
+        if (op == Op.AND) {
             return ArmBoolOp.Operator.AND;
         }
         else if (op == Op.OR) {
