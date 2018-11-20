@@ -27,21 +27,22 @@ public class Ir3Field extends Ir3Id {
     @Override
     void buildArmForAssignStmt(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
-        ArmReg armReg = parent.getArmReg(mdBuilder.getTempReg1(), 
-                mdBuilder, classTypeProvider);
-        
-        int n = classTypeProvider.getClassFieldOffset(parent.type, fieldName);
-        ArmMem srcMem = new ArmMem(armReg, new ArmImmediate(n));
-        
-        mdBuilder.addInsn(new ArmLdr(destReg, srcMem));
+        loadToReg(destReg, mdBuilder, classTypeProvider);
     }
 
-    ArmReg getFieldInReg(ArmReg destReg, ArmReg backupReg, ArmMdBuilder mdBuilder, 
+    ArmReg getFieldInReg(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
-        ArmReg parentReg = parent.getArmReg(backupReg, mdBuilder, classTypeProvider);
-        int offset = classTypeProvider.getClassFieldOffset(parent.type, fieldName);
-        ArmMem srcMem = new ArmMem(parentReg, new ArmImmediate(offset));
-        mdBuilder.addInsn(new ArmLdr(destReg, srcMem));
+        loadToReg(destReg, mdBuilder, classTypeProvider);
         return destReg;
+    }
+
+    private loadToReg(ArmReg destReg, ArmMdBuilder mdBuilder, 
+            ClassTypeProvider classTypeProvider) {
+        ArmReg armReg = parent.getArmReg(mdBuilder.getTempReg1(), 
+                mdBuilder, classTypeProvider);
+        int offset = classTypeProvider.getClassFieldOffset(parent.type, fieldName);
+
+        ArmMem srcArmMem = new Ir3Mem(armReg, offset).getArmMem(mdBuilder.getTempReg2(), mdBuilder);
+        mdBuilder.addInsn(new ArmLdr(destReg, srcArmMem));
     }
 }

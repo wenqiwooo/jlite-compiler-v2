@@ -15,8 +15,10 @@ mov a1,#6400
 bl malloc(PLT)
 mov a1,a1
 ldmfd sp!,{a2,a3,a4,ip}
+ldr ip,=6132
+add ip,a1,ip
 mov v5,#1
-str v5,[a1,#6132]
+str v5,[ip]
 ldr a1,[a1,#6132]
 stmfd sp!,{a1,a2,a3,a4,ip}
 mov a2,a1

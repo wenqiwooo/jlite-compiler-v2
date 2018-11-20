@@ -45,8 +45,7 @@ public class Ir3IfGotoStmt extends Ir3Stmt {
             else if (pred instanceof Ir3Field) {
                 // TODO: By right there should not be a field here.
                 armReg = ((Ir3Field)pred).getFieldInReg(
-                        mdBuilder.getTempReg1(), 
-                        mdBuilder.getTempReg2(), 
+                        mdBuilder.getTempReg1(),
                         mdBuilder, 
                         classTypeProvider);
             }

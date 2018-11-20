@@ -115,11 +115,15 @@ public class ArmMdBuilder {
     }
 
     ArmReg getTempReg1() {
-        return getReg(ArmRegisterType.REG_8);
+        return getReg(ArmRegisterType.REG_IP);
     }
 
     ArmReg getTempReg2() {
-        return getReg(ArmRegisterType.REG_IP);
+        return getReg(ArmRegisterType.REG_8);
+    }
+
+    ArmReg getTempReg3() {
+        return getReg(ArmRegisterType.REG_7);   
     }
 
     String getMethodExitLabel() {
@@ -199,9 +203,7 @@ public class ArmMdBuilder {
                 loc = new VarLocation(paramName, reg);
             } 
             else {
-                ArmImmediate offset = new ArmImmediate(paramOffset);
-                // Using a full descending stack so subtract offset here
-                ArmMem mem = new ArmMem(getFPReg(), offset);
+                Ir3Mem mem = new Ir3Mem(getFPReg(), paramOffset);
                 paramOffset += TypeHelper.getSizeForType(paramType);
                 loc = new VarLocation(paramName, mem);
             }
@@ -232,10 +234,11 @@ public class ArmMdBuilder {
             if (spills.contains(paramName)) { // Spill
                 if (loc.inReg()) { // If param is in a register, move it to stack
                     localOffset += TypeHelper.getSizeForType(paramType);
-                    ArmImmediate offset = new ArmImmediate(-localOffset);
-                    ArmMem destMem = new ArmMem(getFPReg(), offset);
+                    Ir3Mem destMem = new Ir3Mem(getFPReg(), -localOffset);
 
-                    addInsn(new ArmStr(destMem, loc.getReg()));
+                    ArmMem destArmMem = destMem.getArmMem(getTempReg1(), this);
+                    addInsn(new ArmStr(destArmMem, loc.getReg()));
+                    
                     loc.updateLocation(destMem);
                 }
             }
@@ -266,7 +269,8 @@ public class ArmMdBuilder {
                         idxToRegisterMap.put(assignIdx, reg);
                     }
                     if (liveParams.contains(paramName)) {
-                        addInsn(new ArmLdr(reg, loc.getMem()));
+                        ArmMem srcArmMem = loc.getMem().getArmMem(getTempReg1(), this);
+                        addInsn(new ArmLdr(reg, srcArmMem));
                     }
                     loc.updateLocation(reg);
                 }
@@ -281,8 +285,7 @@ public class ArmMdBuilder {
 
             if (spills.contains(localName)) { // Spill variable
                 localOffset += TypeHelper.getSizeForType(localType);
-                ArmImmediate offset = new ArmImmediate(-localOffset);
-                ArmMem destMem = new ArmMem(getFPReg(), offset);
+                Ir3Mem destMem = new Ir3Mem(getFPReg(), -localOffset);
                 loc = new VarLocation(localName, destMem);
             }
             else { 
