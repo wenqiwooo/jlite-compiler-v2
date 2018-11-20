@@ -3,9 +3,12 @@ class MainClass {
 		TestClass tc;
 
 		tc = new TestClass();
+		
+		tc.v0 = 301;
 		tc.v1533 = 1;
+		tc.v1 = tc.v0 + tc.v1533;
 
-		println(tc.v1533);
+		println(tc.v1);
 	}
 }
 

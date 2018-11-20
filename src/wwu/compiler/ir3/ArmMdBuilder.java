@@ -79,6 +79,9 @@ public class ArmMdBuilder {
     // Never call this twice
     ArmMd build() {
         // Add epilogue
+        if (methodName.equals("main")) {
+            addInsn(new ArmMov(getReg(ArmRegisterType.REG_0), new ArmImmediate(0)));
+        }
         addInsn(new ArmLabel(getMethodExitLabel()));
         addInsn(new ArmArithOp(ArmArithOp.Operator.ADD, getSPReg(),
                 getSPReg(), new ArmImmediate(localOffset)));

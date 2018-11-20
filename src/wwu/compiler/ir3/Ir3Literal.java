@@ -62,8 +62,7 @@ public class Ir3Literal extends Ir3BasicId {
                 return new ArmImmediate((int)value);
             }
             if (backupReg != null) {
-                ArmLdrConstruct ldrOperand = new ArmLdrConstruct(
-                    classTypeProvider.addGlobalLiteral((int)value));
+                ArmLdrConstruct ldrOperand = new ArmLdrConstruct((int)value);
                 mdBuilder.addInsn(new ArmLdr(backupReg, ldrOperand));
             }
             return backupReg;

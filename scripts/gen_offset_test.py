@@ -12,7 +12,7 @@ def write_class(output_file, name, attributes):
 
 
 if __name__ == '__main__':
-    output_file = '../tests/final/immd_test'
+    output_file = '../tests/final/offset_test'
     name = 'TestClass'
     attributes = tuple(('v{}'.format(i), 'Int') for i in range(1600))
 

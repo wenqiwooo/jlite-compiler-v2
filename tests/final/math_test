@@ -1,0 +1,66 @@
+class MainClass {
+    Void main() {
+        Math m;
+        m = new Math();
+
+        println("Answer of Fib(11) is: ");
+        println(m.fib(11));
+        println("\n");
+
+        println("Answer of 100*100 is: ");
+        println(m.times(100, 100));
+        println("\n");
+    }
+}
+
+class Math {
+    Int fib(Int x) {
+        if (x == 0 || x == 1) {
+            return x;
+        } else {
+            return fib(x-1) + fib(x-2);
+        }
+    }
+
+    Int times(Int x, Int y) {
+        Node ll;
+        Int z;
+        Int sum;
+
+        ll = new Node();
+        ll.setVal(-9999);
+        
+        z = 0;
+        while (z < y) {
+            ll = ll.push(x);
+            z = z + 1;
+        }
+
+        sum = 0;
+        while (z > 0) {
+            sum = sum + ll.val;
+            ll = ll.next;
+            z = z - 1;
+        }
+
+        return sum;
+    }
+}
+
+class Node {
+    Node next;
+    Int val;
+
+    Void setVal(Int x) {
+        this.val = x;
+    }
+
+    
+    Node push(Int x) {
+        Node nd;
+        nd = new Node();
+        nd.setVal(x);
+        nd.next = this;
+        return nd;
+    }
+}

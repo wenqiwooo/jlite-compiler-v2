@@ -144,6 +144,8 @@ public class Ir3Call extends Ir3Expr {
             if (destToSrcMap.containsKey(destReg)) {
                 continue;
             }
+            // This will always move the value into destReg since they are not
+            // in reg to begin with.
             args.get(i).getArmReg(destReg, mdBuilder, classTypeProvider);
         }
     }

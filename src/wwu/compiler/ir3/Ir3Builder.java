@@ -2,7 +2,7 @@ package wwu.compiler.ir3;
 
 import java.util.*;
 
-import wwu.compiler.util.Pair;
+import wwu.compiler.util.*;
 import wwu.compiler.arm.ArmProgram;
 import wwu.compiler.common.TypeHelper;
 import wwu.compiler.exception.*;
@@ -223,10 +223,11 @@ public class Ir3Builder {
 
         @Override
         public String addGlobalLiteral(String value) {
-            String label = armProgram.getLabelForLiteral(value);
+            String escapedStr = Util.escapeStr(value);
+            String label = armProgram.getLabelForLiteral(escapedStr);
             if (label == null) {
                 label = "D" + nextLabelIdx++;
-                armProgram.addLiteral(label, value);
+                armProgram.addLiteral(label, escapedStr);
             }
             return label;
         }
