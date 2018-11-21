@@ -16,6 +16,7 @@ test: parser.class
 
 parser.class: Lexer.java parser.java
 	find $(PROJ_PATH) -type f -name '*.java' > sources
+	rm -rf classes && mkdir classes
 	$(JAVAC) -cp $(CLASS_PATH) -d classes/ @sources
 
 Lexer.java: lexer.flex
@@ -36,4 +37,5 @@ clean:
 	-name '*~' \) \
 	-delete
 	rm -rf classes
+	rm -rf build
 	# rm -f parser.java Lexer.java sym.java output.txt *.class *~

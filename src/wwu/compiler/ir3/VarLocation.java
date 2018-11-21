@@ -5,33 +5,33 @@ import wwu.compiler.arm.*;
 class VarLocation {
     String varName;
     /**
-     * For now, armReg and armMem must be exclusively set, i.e.
+     * For now, armReg and mem must be exclusively set, i.e.
      * one must be null, one must be non-null.
      */
     ArmReg armReg;
-    ArmMem armMem;
+    Ir3Mem mem;
     
     VarLocation(String varName, ArmReg reg) {
         this(varName, reg, null);
     }
 
-    VarLocation(String varName, ArmMem mem) {
+    VarLocation(String varName, Ir3Mem mem) {
         this(varName, null, mem);
     }
 
-    private VarLocation(String varName, ArmReg reg, ArmMem mem) {
+    private VarLocation(String varName, ArmReg reg, Ir3Mem mem) {
         this.varName = varName;
         this.armReg = reg;
-        this.armMem = mem;
+        this.mem = mem;
     }
 
     void updateLocation(ArmReg reg) {
         this.armReg = reg;
-        this.armMem = null;
+        this.mem = null;
     }
 
-    void updateLocation(ArmMem mem) {
-        this.armMem = mem;
+    void updateLocation(Ir3Mem mem) {
+        this.mem = mem;
         this.armReg = null;
     }
 
@@ -40,14 +40,14 @@ class VarLocation {
     }
 
     boolean inMem() {
-        return armMem != null;
+        return mem != null;
     }
 
     ArmReg getReg() {
         return armReg;
     }
 
-    ArmMem getMem() {
-        return armMem;
+    Ir3Mem getMem() {
+        return mem;
     }
 }

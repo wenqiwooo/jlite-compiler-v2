@@ -13,7 +13,6 @@ public class Ir3AssignStmt extends Ir3Stmt {
     String defSymbol = null;
     Set<String> useSymbols;
 
-    // TODO: 
     public Ir3AssignStmt(Ir3Id assignee, Ir3Expr expr) {
         this.assignee = assignee;
         this.expr = expr;
@@ -54,36 +53,42 @@ public class Ir3AssignStmt extends Ir3Stmt {
     void buildArm(ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) throws CodeGenerationException {
         if (assignee instanceof Ir3Identifier) {
-            VarLocation loc = mdBuilder.getLocationForSymbol(
-                    ((Ir3Identifier)assignee).varName);
+            VarLocation loc = mdBuilder.getLocationForSymbol(((Ir3Identifier)assignee).varName);
             if (loc.inReg()) {
                 expr.buildArmForAssignStmt(loc.getReg(), mdBuilder, classTypeProvider);
             } 
             else {
-                ArmReg tempReg = mdBuilder.getTempReg1();
-                expr.buildArmForAssignStmt(tempReg, mdBuilder, classTypeProvider);
-                mdBuilder.addInsn(new ArmStr(loc.getMem(), tempReg));
+                ArmReg tempReg1 = mdBuilder.getTempReg1();
+                expr.buildArmForAssignStmt(tempReg1, mdBuilder, classTypeProvider);
+                
+                ArmMem destMem = loc.getMem().getArmMem(mdBuilder.getTempReg2(), mdBuilder);
+                mdBuilder.addInsn(new ArmStr(destMem, tempReg1));
             }
         }
         else if (assignee instanceof Ir3Field) {
             Ir3Field field = (Ir3Field)assignee;
+            // Location of parent class
             VarLocation loc = mdBuilder.getLocationForSymbol(field.parent.varName);
-            int os = classTypeProvider.getClassFieldOffset(field.parent.type, field.fieldName);
-            ArmImmediate offset = new ArmImmediate(os);
-            ArmReg tempReg1 = mdBuilder.getTempReg1();
+            int offset = classTypeProvider.getClassFieldOffset(field.parent.type, field.fieldName);
             
-            expr.buildArmForAssignStmt(tempReg1, mdBuilder, classTypeProvider);
+            ArmReg tempReg1 = mdBuilder.getTempReg1();
+            ArmReg tempReg2 = mdBuilder.getTempReg2();
+            ArmReg tempReg3 = mdBuilder.getTempReg3();
 
+            // Result is saved in tempReg1, don't touch it anymore!
+            expr.buildArmForAssignStmt(tempReg1, mdBuilder, classTypeProvider);
+            
+            ArmMem destMem;
             if (loc.inReg()) {
-                ArmMem destMem = new ArmMem(loc.getReg(), offset);
-                mdBuilder.addInsn(new ArmStr(destMem, tempReg1));
-            } 
-            else {
-                ArmReg tempReg2 = mdBuilder.getTempReg2();
-                mdBuilder.addInsn(new ArmLdr(tempReg2, loc.getMem()));
-                ArmMem destMem = new ArmMem(tempReg2, offset);
-                mdBuilder.addInsn(new ArmStr(destMem, tempReg1));
+                destMem = new Ir3Mem(loc.getReg(), offset).getArmMem(tempReg2, mdBuilder);
             }
+            else {
+                ArmMem mem = loc.getMem().getArmMem(tempReg2, mdBuilder);
+                mdBuilder.addInsn(new ArmLdr(tempReg2, mem));
+                destMem = new Ir3Mem(tempReg2, offset).getArmMem(tempReg3, mdBuilder);
+            }
+
+            mdBuilder.addInsn(new ArmStr(destMem, tempReg1));
         }
         else {
             throw new CodeGenerationException("Assignee is invalid");

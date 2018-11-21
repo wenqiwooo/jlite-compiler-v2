@@ -19,4 +19,9 @@ public abstract class ArmInsn {
     public void setNext(ArmInsn next) {
         this.next = next;
     }
+
+    void clearPrevNext() {
+        this.prev = null;
+        this.next = null;
+    }
 }

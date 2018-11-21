@@ -31,4 +31,8 @@ public class ArmMov extends ArmInsn {
 
         return sb.toString();
     }
+
+    boolean destAndSrcSame() {
+        return destReg == src;
+    }
 }

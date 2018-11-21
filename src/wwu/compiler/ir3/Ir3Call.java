@@ -58,7 +58,7 @@ public class Ir3Call extends Ir3Expr {
         n *= ArmMode.WORD.getSize();
         ArmOperand offset = new ArmImmediate(n);
         mdBuilder.addInsn(
-                new ArmArithOp(ArmArithOp.Operator.SUB, sp, sp, offset));
+                new ArmArithOp(ArmArithOp.Operator.ADD, sp, sp, offset));
         
         // Move result from r0 to destReg
         if (destReg != null) {
@@ -144,6 +144,8 @@ public class Ir3Call extends Ir3Expr {
             if (destToSrcMap.containsKey(destReg)) {
                 continue;
             }
+            // This will always move the value into destReg since they are not
+            // in reg to begin with.
             args.get(i).getArmReg(destReg, mdBuilder, classTypeProvider);
         }
     }

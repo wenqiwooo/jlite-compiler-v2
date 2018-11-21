@@ -110,16 +110,38 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
 
     private void armForBoolExprAssign(ArmReg destReg, ArmMdBuilder mdBuilder, 
             ClassTypeProvider classTypeProvider) {
-        ArmReg armReg1 = operand1.getArmReg(destReg, mdBuilder, classTypeProvider);
-        if (armReg1 != destReg) {
-            mdBuilder.addInsn(new ArmMov(destReg, armReg1));
-            armReg1 = destReg;
-        }
-        ArmReg armReg2 = operand2.getArmReg(mdBuilder.getTempReg2(), 
-                mdBuilder, classTypeProvider);
-                
+        ArmReg armReg1 = operand1.tryGetArmReg(mdBuilder, classTypeProvider);
+        ArmReg armReg2 = operand2.tryGetArmReg(mdBuilder, classTypeProvider);
         ArmBoolOp.Operator armOp = armOpForBoolOp(operator);
-        mdBuilder.addInsn(new ArmBoolOp(armOp, armReg1, armReg2));
+        
+        if (armReg1 == destReg) {
+            if (armReg2 == null) {
+                armReg2 = operand2.getArmReg(mdBuilder.getTempReg1(), 
+                        mdBuilder, classTypeProvider);
+            }
+            mdBuilder.addInsn(new ArmBoolOp(armOp, armReg1, armReg2));
+        }
+        else if (armReg2 == destReg) {
+            if (armReg1 == null) {
+                armReg1 = operand1.getArmReg(mdBuilder.getTempReg1(), 
+                        mdBuilder, classTypeProvider);
+            }
+            mdBuilder.addInsn(new ArmBoolOp(armOp, armReg2, armReg1));
+        }
+        else {
+            if (armReg1 == null) {
+                armReg1 = operand1.getArmReg(destReg, 
+                        mdBuilder, classTypeProvider);
+            }
+            if (armReg2 == null) {
+                armReg2 = operand2.getArmReg(mdBuilder.getTempReg1(), 
+                        mdBuilder, classTypeProvider);
+            }
+            if (armReg1 != destReg) {
+                mdBuilder.addInsn(new ArmMov(destReg, armReg1));
+            }
+            mdBuilder.addInsn(new ArmBoolOp(armOp, destReg, armReg2));
+        }
     }
 
     private static ArmCondition armCondForRelOp(Op op) {
@@ -162,7 +184,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
     }
 
     private static ArmBoolOp.Operator armOpForBoolOp(Op op) {
-        if (op == Op.ADD) {
+        if (op == Op.AND) {
             return ArmBoolOp.Operator.AND;
         }
         else if (op == Op.OR) {

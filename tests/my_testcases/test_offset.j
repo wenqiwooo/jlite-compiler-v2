@@ -1,11 +1,19 @@
+//
+// Testing memory address offsets
+//
+
 class MainClass {
 	Void main() {
 		TestClass tc;
 
 		tc = new TestClass();
+		
+		tc.v0 = 301;
 		tc.v1533 = 1;
+		
+		tc.v1 = tc.v1533 + tc.v1533 + tc.v0; 	// tc.v1 = 1 + 1 + 301 = 303
 
-		println(tc.v1533);
+		println(tc.v1); 						// Expect 303 to be printed
 	}
 }
 

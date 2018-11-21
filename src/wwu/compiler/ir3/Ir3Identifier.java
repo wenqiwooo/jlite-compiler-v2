@@ -36,7 +36,9 @@ public class Ir3Identifier extends Ir3BasicId {
         if (loc.inReg()) {
             return loc.getReg();
         } else if (backupReg != null) {
-            mdBuilder.addInsn(new ArmLdr(backupReg, loc.getMem()));
+            // Identifier will be refed by sp or fp
+            ArmMem armMem = loc.getMem().getArmMem(backupReg, mdBuilder);
+            mdBuilder.addInsn(new ArmLdr(backupReg, armMem));
             return backupReg;
         }
         return null;
