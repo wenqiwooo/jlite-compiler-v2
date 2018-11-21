@@ -40,6 +40,14 @@ class_path=$1
 
 # rm output.txt
 
-# java -cp $class_path wwu.compiler.Jlc tests/final/test1 > out.s
-java -cp $class_path wwu.compiler.Jlc tests/testcases/test_ops.j > out.s
-java -cp $class_path wwu.compiler.Jlc tests/testcases/test_ops.j -opt > out_opt.s
+# Produce assembly files for tests
+
+rm -rf build && mkdir build
+declare -a tests=("sample" "test_control_flow" "test_func" "test_func2" "test_obj" "test_offset")
+for i in "${tests[@]}"
+do
+    java -cp $class_path wwu.compiler.Jlc tests/my_testcases/"$i".j > ./build/"$i".s
+    java -cp $class_path wwu.compiler.Jlc tests/my_testcases/"$i".j -opt > ./build/"$i"_opt.s
+    echo "Generated asm for $i.j"
+done
+echo "All generated asm files saved to build directory."
