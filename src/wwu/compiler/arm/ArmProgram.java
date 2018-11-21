@@ -69,4 +69,11 @@ public class ArmProgram {
 
         return sb.toString();
     }
+
+    // Simple optimization to remove redudant insns.
+    public void optimize() {
+        for (ArmMd method : methods) {
+            method.optimize();
+        }
+    }
 }

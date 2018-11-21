@@ -37,4 +37,52 @@ public class ArmMd {
         sb.append("\n");
         return sb.toString();
     }
+
+    // Simple peephole optimizations.
+    void optimize() {
+        ArmInsnChain chain = new ArmInsnChain();
+        ArmInsn insn = firstInsn;
+
+        while (insn != null) {
+            ArmInsn nextInsn = insn.next;
+
+            if (insn instanceof ArmMov) {
+                if (((ArmMov)insn).destAndSrcSame()) {
+                    // Redundant insn, do nothing
+                } else {
+                    insn.clearPrevNext();
+                    chain.append(insn);
+                }
+            }
+            else if (insn instanceof ArmArithOp) {
+                ArmArithOp mathInsn = (ArmArithOp)insn;
+                if (mathInsn.srcOperand instanceof ArmImmediate) {
+                    ArmImmediate immd = (ArmImmediate)mathInsn.srcOperand;
+                    ArmArithOp.Operator op = mathInsn.operator;
+
+                    if ((op == ArmArithOp.Operator.ADD || op == ArmArithOp.Operator.SUB) && 
+                            immd.value == 0) {
+                        // Redundant insn, do nothing
+                    }
+                    else {
+                        insn.clearPrevNext();
+                        chain.append(insn);
+                    }
+                } 
+                else {
+                    insn.clearPrevNext();
+                    chain.append(insn);
+                }
+            }
+            else {
+                insn.clearPrevNext();
+                chain.append(insn);
+            }
+
+            insn = nextInsn;
+        }
+
+        firstInsn = chain.firstInsn;
+        lastInsn = chain.lastInsn;
+    }
 }

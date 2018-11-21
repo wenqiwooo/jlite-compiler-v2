@@ -76,7 +76,7 @@ public class ArmMdBuilder {
         }
     }
 
-    // Never call this twice
+    // Never call this twice!!
     ArmMd build() {
         // Add epilogue
         if (methodName.equals("main")) {
@@ -88,7 +88,7 @@ public class ArmMdBuilder {
         List<ArmReg> nonScratchRegs = getNonScratchRegs();
         addInsn(ArmLdm.pop(nonScratchRegs));
         addInsn(ArmLdm.pop(Arrays.asList(getFPReg(), getPCReg())));
-        
+
         return new ArmMd(methodName, firstInsn);
     }
 
@@ -206,6 +206,7 @@ public class ArmMdBuilder {
                 loc = new VarLocation(paramName, reg);
             } 
             else {
+                // System.out.println(paramName + " " + paramOffset);
                 Ir3Mem mem = new Ir3Mem(getFPReg(), paramOffset);
                 paramOffset += TypeHelper.getSizeForType(paramType);
                 loc = new VarLocation(paramName, mem);

@@ -1,0 +1,17 @@
+class MainClass {
+    Void main() {
+        FuncTest ft;
+        
+        ft = new FuncTest();
+
+        println("2 + 3 = ");
+        println(ft.getLastTwoSums(1,1,1,1,1,1,2,3));
+        println("\n");
+    }
+}
+
+class FuncTest {
+    Int getLastTwoSums(Int v1, Int v2, Int v3, Int v4, Int v5, Int v6, Int v7, Int v8) {
+        return v7 + v8;
+    }
+}

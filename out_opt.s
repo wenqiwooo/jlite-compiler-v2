@@ -13,11 +13,9 @@ main:
 stmfd sp!,{fp,lr}
 stmfd sp!,{v1,v2,v3,v4,v5}
 mov fp,sp
-sub sp,sp,#0
 stmfd sp!,{a2,a3,a4,ip}
 mov a1,#0
 bl malloc(PLT)
-mov a1,a1
 ldmfd sp!,{a2,a3,a4,ip}
 stmfd sp!,{a1,a2,a3,a4,ip}
 ldr a1,=D0
@@ -39,7 +37,6 @@ mov a3,#1
 mov a4,#1
 bl Func_FuncTest_0(PLT)
 add sp,sp,#20
-mov a1,a1
 ldmfd sp!,{a2,a3,a4,ip}
 stmfd sp!,{a1,a2,a3,a4,ip}
 mov a2,a1
@@ -53,7 +50,6 @@ ldmfd sp!,{a1,a2,a3,a4,ip}
 mov a1,#0
 
 main_exit:
-add sp,sp,#0
 ldmfd sp!,{v1,v2,v3,v4,v5}
 ldmfd sp!,{fp,pc}
 
@@ -61,7 +57,6 @@ Func_FuncTest_0:
 stmfd sp!,{fp,lr}
 stmfd sp!,{v1,v2,v3,v4,v5}
 mov fp,sp
-sub sp,sp,#0
 ldr a1,[fp,#40]
 ldr a2,[fp,#44]
 add a2,a1,a2
@@ -69,7 +64,6 @@ mov a1,a2
 b Func_FuncTest_0_exit
 
 Func_FuncTest_0_exit:
-add sp,sp,#0
 ldmfd sp!,{v1,v2,v3,v4,v5}
 ldmfd sp!,{fp,pc}
 

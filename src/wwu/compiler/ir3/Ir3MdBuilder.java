@@ -241,10 +241,7 @@ public class Ir3MdBuilder {
         }
     }
 
-    /**
-     * 
-     */
-    public ArmMd getArmMd(ClassTypeProvider classTypeProvider) {
+    ArmMd getArmMd(ClassTypeProvider classTypeProvider) {
         buildCFGraph();
         cfGraph.backwardAnalysis(new LivenessFunction());
         Pair<Map<String, Integer>, Set<String>> res = 
@@ -269,11 +266,6 @@ public class Ir3MdBuilder {
          * higher address ---------------------------------------------- lower address
          *                [parameters][lr][fp][saved registers] [locals] 
          *                                                     ^ current fp points here 
-         * 
-         * UPDATED
-         * higher address ---------------------------------------------- lower address
-         *                [parameters][lr][fp][saved registers] [locals] 
-         *                            ^ fp
          * 
          * Prologue:
          *   strfd {lr, fp} // strfd {fp} if the method does not call other methods
