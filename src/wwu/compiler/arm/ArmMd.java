@@ -45,13 +45,11 @@ public class ArmMd {
 
         while (insn != null) {
             ArmInsn nextInsn = insn.next;
+            boolean skipInsn = false;
 
             if (insn instanceof ArmMov) {
                 if (((ArmMov)insn).destAndSrcSame()) {
-                    // Redundant insn, do nothing
-                } else {
-                    insn.clearPrevNext();
-                    chain.append(insn);
+                    skipInsn = true;
                 }
             }
             else if (insn instanceof ArmArithOp) {
@@ -62,19 +60,12 @@ public class ArmMd {
 
                     if ((op == ArmArithOp.Operator.ADD || op == ArmArithOp.Operator.SUB) && 
                             immd.value == 0) {
-                        // Redundant insn, do nothing
-                    }
-                    else {
-                        insn.clearPrevNext();
-                        chain.append(insn);
+                        skipInsn = true;
                     }
                 } 
-                else {
-                    insn.clearPrevNext();
-                    chain.append(insn);
-                }
             }
-            else {
+
+            if (!skipInsn) {
                 insn.clearPrevNext();
                 chain.append(insn);
             }
