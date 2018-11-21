@@ -41,5 +41,5 @@ class_path=$1
 # rm output.txt
 
 # java -cp $class_path wwu.compiler.Jlc tests/final/test1 > out.s
-java -cp $class_path wwu.compiler.Jlc tests/final/func_test > out.s
-java -cp $class_path wwu.compiler.Jlc tests/final/func_test -opt > out_opt.s
+java -cp $class_path wwu.compiler.Jlc tests/testcases/test_ops.j > out.s
+java -cp $class_path wwu.compiler.Jlc tests/testcases/test_ops.j -opt > out_opt.s
