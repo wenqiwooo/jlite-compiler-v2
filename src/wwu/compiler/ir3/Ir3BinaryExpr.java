@@ -140,7 +140,7 @@ public class Ir3BinaryExpr extends Ir3BasicExpr {
             if (armReg1 != destReg) {
                 mdBuilder.addInsn(new ArmMov(destReg, armReg1));
             }
-            mdBuilder.addInsn(new ArmBoolOp(armOp, armReg1, armReg2));
+            mdBuilder.addInsn(new ArmBoolOp(armOp, destReg, armReg2));
         }
     }
 
